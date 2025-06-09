@@ -9,4 +9,3 @@
 ### Important
 
 - After all changes are made, ALWAYS build the project with `npm run build`. Ignore warnings, fix errors.
-

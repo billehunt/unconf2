@@ -11,7 +11,7 @@ Create a **zero-install, QR-first web tool** that allows an unconference to be l
 | **FR-1**  | **Instant Event Setup**          | Organiser wizard (event info → rooms → time blocks) completes in ≤ 10 min.                                                      |
 | **FR-2**  | **QR-Based Onboarding**          | Unique QR opens attendee web app; no login required unless organiser opts for name/email capture.                               |
 | **FR-3**  | **Interest & Topic Capture**     | Attendees can enter free-text interests and propose session topics; entries accepted until evaluation ends.                     |
-| **FR-4**  | **AI Topic Suggestions**         | During evaluation, an LLM clusters interests and proposes up to *5 new topics per minute* (interval configurable).              |
+| **FR-4**  | **AI Topic Suggestions**         | During evaluation, an LLM clusters interests and proposes up to _5 new topics per minute_ (interval configurable).              |
 | **FR-5**  | **Voting Board (Up-votes Only)** | Attendees up-vote topics in real time; no down-votes.                                                                           |
 | **FR-6**  | **Moderator Controls**           | Organiser can delete topics (e.g., duplicates) at any time before lock-down; cannot add down-votes.                             |
 | **FR-7**  | **Evaluation Timer**             | Default 10-minute countdown (configurable). At expiry or organiser override, voting freezes and top-ranked topics are “locked.” |

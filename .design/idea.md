@@ -1,4 +1,5 @@
 Provide a zero-install unconference tool that:
+
 - lets organisers spin up an event in minutes;
 - users scan QR code, sign up and optionally enter interests and proposed topics
 - AI proposes additional topics based on users interests
