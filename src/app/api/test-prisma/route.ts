@@ -4,7 +4,7 @@ import { testPrismaConnection } from '@/lib/prisma';
 export async function GET() {
   try {
     const result = await testPrismaConnection();
-    
+
     if (result.success) {
       return NextResponse.json({
         success: true,
@@ -34,4 +34,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-} 
+}

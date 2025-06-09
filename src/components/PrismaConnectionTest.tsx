@@ -29,8 +29,12 @@ export function PrismaConnectionTest() {
     const directUrl = process.env.DIRECT_URL || 'Not set';
 
     setEnvVars({
-      databaseUrl: databaseUrl !== 'Not set' ? `${databaseUrl.slice(0, 30)}...` : 'Not set',
-      directUrl: directUrl !== 'Not set' ? `${directUrl.slice(0, 30)}...` : 'Not set',
+      databaseUrl:
+        databaseUrl !== 'Not set'
+          ? `${databaseUrl.slice(0, 30)}...`
+          : 'Not set',
+      directUrl:
+        directUrl !== 'Not set' ? `${directUrl.slice(0, 30)}...` : 'Not set',
     });
   }, []);
 
@@ -49,7 +53,9 @@ export function PrismaConnectionTest() {
         setConnectionStatus({
           status: 'success',
           message: 'Database connection successful!',
-          details: result.details || 'Prisma client is properly configured and connected.',
+          details:
+            result.details ||
+            'Prisma client is properly configured and connected.',
         });
       } else {
         setConnectionStatus({
@@ -63,7 +69,9 @@ export function PrismaConnectionTest() {
         status: 'error',
         message: 'Connection test failed',
         details:
-          error instanceof Error ? error.message : 'Failed to reach test endpoint',
+          error instanceof Error
+            ? error.message
+            : 'Failed to reach test endpoint',
       });
     }
   };
@@ -180,12 +188,12 @@ export function PrismaConnectionTest() {
               ✅ Database Ready
             </h5>
             <p className="text-xs text-green-700">
-              Prisma is connected to your Supabase PostgreSQL database. You can now
-              define your data models and run migrations.
+              Prisma is connected to your Supabase PostgreSQL database. You can
+              now define your data models and run migrations.
             </p>
           </div>
         )}
       </CardContent>
     </Card>
   );
-} 
+}

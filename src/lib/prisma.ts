@@ -9,10 +9,12 @@ declare global {
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
-export const prisma = globalForPrisma.prisma || new PrismaClient({
-  log: ['query', 'error', 'warn'],
-  errorFormat: 'pretty',
-});
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: ['query', 'error', 'warn'],
+    errorFormat: 'pretty',
+  });
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
@@ -22,24 +24,25 @@ if (process.env.NODE_ENV !== 'production') {
 export const testPrismaConnection = async () => {
   try {
     await prisma.$connect();
-    
+
     // Test with a simple query
     const result = await prisma.$queryRaw`SELECT 1 as test`;
-    
+
     await prisma.$disconnect();
-    
-    return { 
-      success: true, 
+
+    return {
+      success: true,
       message: 'Prisma connection successful',
-      details: `Database query returned: ${JSON.stringify(result)}`
+      details: `Database query returned: ${JSON.stringify(result)}`,
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
-    return { 
-      success: false, 
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+
+    return {
+      success: false,
       message: 'Prisma connection failed',
-      details: errorMessage
+      details: errorMessage,
     };
   }
 };
@@ -55,7 +58,7 @@ export const healthCheck = async () => {
     const start = Date.now();
     await prisma.$queryRaw`SELECT 1`;
     const duration = Date.now() - start;
-    
+
     return {
       status: 'healthy',
       database: 'connected',
@@ -79,4 +82,4 @@ export type PrismaUser = {
   name: string | null;
   createdAt: Date;
   updatedAt: Date;
-}; 
+};

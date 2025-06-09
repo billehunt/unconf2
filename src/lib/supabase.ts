@@ -25,7 +25,7 @@ export const supabase = createClient(
 // Server-side client with service role key (for admin operations)
 export const createServiceSupabase = () => {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  
+
   if (!serviceRoleKey || !supabaseUrl) {
     throw new Error(
       'SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_URL are required for server-side operations'
@@ -75,7 +75,8 @@ export const testSupabaseConnection = async () => {
   if (!supabaseUrl || !supabaseAnonKey) {
     return {
       success: false,
-      message: 'Missing environment variables. Please configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.',
+      message:
+        'Missing environment variables. Please configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.',
     };
   }
 
@@ -85,7 +86,8 @@ export const testSupabaseConnection = async () => {
   ) {
     return {
       success: false,
-      message: 'Placeholder values detected. Please replace with your actual Supabase credentials.',
+      message:
+        'Placeholder values detected. Please replace with your actual Supabase credentials.',
     };
   }
 

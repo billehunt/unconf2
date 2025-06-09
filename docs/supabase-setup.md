@@ -93,16 +93,19 @@ Row Level Security is crucial for protecting your data:
 ## Step 5: Configure Database Connection (Prisma)
 
 1. **Get Database Connection Details**
+
    - In your Supabase dashboard: `Settings` → `Database`
    - Look for "Connection string" section
    - Note down your database password (the one you set when creating the project)
 
 2. **Construct Connection URLs**
+
    - Your project reference is the part before `.supabase.co` in your Project URL
    - Replace `[your-project-ref]` and `[your-db-password]` in the template
    - Example: If your URL is `https://abc123.supabase.co`, your project ref is `abc123`
 
 3. **Add Database URLs to Environment**
+
    ```env
    DATABASE_URL="postgresql://postgres:your-actual-password@db.your-project-ref.supabase.co:5432/postgres?connection_limit=1&pool_timeout=10"
    DIRECT_URL="postgresql://postgres:your-actual-password@db.your-project-ref.supabase.co:5432/postgres"
