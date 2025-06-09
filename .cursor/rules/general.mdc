@@ -3,6 +3,10 @@ description:
 globs: 
 alwaysApply: true
 ---
+### Project Details
+
+- you can find the PRD for this project in [prd.md](mdc:prd.md). Be sure to read it when you need an overall idea of what the project is about.
+
 ### Components & Naming
 
 - Use functional components with `"use client"` if needed.
