@@ -132,3 +132,9 @@ Successfully replaced placeholder edit interface with comprehensive event editin
 
 **Rule for future projects:** When building editing interfaces, use tabbed layouts to organize complex forms and implement real-time validation with user-friendly error messages. Always prioritize friendly URLs over technical IDs in user-facing interfaces, even if it requires additional lookup logic.
 
+# Implemented Attendee Landing Page and Onboarding Flow
+
+Successfully created complete attendee onboarding system for QR code visitors. Built AttendeeJoinForm component with name/email validation and optional anonymous joining. Created attendee API endpoints for creating and fetching attendee records. Implemented EventLanding component that conditionally shows join form or main event view based on localStorage. Added session persistence and automatic reconnection for returning visitors. Supports both named attendees and anonymous users with proper data validation and user-friendly error handling.
+
+**Rule for future projects:** For user onboarding flows, always implement client-side state management with localStorage persistence to remember user sessions across page reloads. Design forms with progressive disclosure (optional fields) to reduce friction while still capturing useful data when users are willing to provide it.
+
