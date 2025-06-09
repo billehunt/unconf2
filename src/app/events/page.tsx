@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, MapPin, Users, QrCode, ExternalLink } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users, QrCode, ExternalLink, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 
@@ -213,6 +213,12 @@ export default async function EventsPage() {
                             <Button variant="outline" className="w-full flex items-center gap-2">
                               <ExternalLink className="w-4 h-4" />
                               View Event
+                            </Button>
+                          </Link>
+                          <Link href={`/organiser/edit/${event.id}`}>
+                            <Button variant="outline" size="sm" className="flex items-center gap-2">
+                              <Settings className="w-4 h-4" />
+                              Edit
                             </Button>
                           </Link>
                           {status.label !== 'Completed' && (

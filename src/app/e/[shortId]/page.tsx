@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Clock, MapPin, Users, QrCode, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { QRCode } from '@/components/qr-code';
+import { EventUrlDisplay } from '@/components/event-url-display';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 
@@ -184,14 +185,12 @@ export default async function EventPage({ params }: EventPageProps) {
                     📢 Share This Event
                   </h3>
                   <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Event URL:
-                      </p>
-                      <code className="block p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm break-all">
-                        {typeof window !== 'undefined' ? `${window.location.origin}${eventUrl}` : eventUrl}
-                      </code>
-                    </div>
+                                         <div>
+                       <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                         Event URL:
+                       </p>
+                       <EventUrlDisplay eventUrl={eventUrl} />
+                     </div>
                     
                     <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                       <p className="text-blue-900 dark:text-blue-100 text-sm">

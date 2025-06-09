@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Users, ExternalLink } from 'lucide-react';
+import { DeleteEventButton } from '@/components/delete-event-button';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 
@@ -181,6 +182,24 @@ export default async function EventEditPage({ params }: EventEditPageProps) {
                   </Button>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+          
+          {/* Danger Zone */}
+          <Card className="border-red-200 dark:border-red-800">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-4 text-red-900 dark:text-red-100">
+                Danger Zone
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Once you delete an event, there is no going back. Please be certain.
+              </p>
+              <DeleteEventButton
+                eventId={event.id}
+                eventTitle={event.title}
+                attendeeCount={event._count.attendees}
+                topicCount={event._count.topics}
+              />
             </CardContent>
           </Card>
         </div>

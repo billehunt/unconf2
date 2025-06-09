@@ -128,4 +128,66 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const eventId = searchParams.get('eventId');
+    
+    if (!eventId) {
+      return NextResponse.json(
+        { error: 'Event ID is required' },
+        { status: 400 }
+      );
+    }
+    
+    // Check if event exists
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+      include: {
+        _count: {
+          select: {
+            attendees: true,
+            topics: true,
+          },
+        },
+      },
+    });
+    
+    if (!event) {
+      return NextResponse.json(
+        { error: 'Event not found' },
+        { status: 404 }
+      );
+    }
+    
+    // Delete the event (cascade delete will handle related records)
+    await prisma.event.delete({
+      where: { id: eventId },
+    });
+    
+    logger.info('Event deleted successfully', {
+      component: 'events-api',
+      eventId,
+      title: event.title,
+      attendeeCount: event._count.attendees,
+      topicCount: event._count.topics,
+    });
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Event deleted successfully',
+    });
+    
+  } catch (error) {
+    logger.error('Failed to delete event', error as Error, {
+      component: 'events-api',
+    });
+    
+    return NextResponse.json(
+      { error: 'Failed to delete event' },
+      { status: 500 }
+    );
+  }
 } 
