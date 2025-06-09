@@ -215,7 +215,7 @@ export default async function EventsPage() {
                               View Event
                             </Button>
                           </Link>
-                          <Link href={`/organiser/edit/${event.id}`}>
+                          <Link href={`/organiser/edit/${friendlySlug || event.id}`}>
                             <Button variant="outline" size="sm" className="flex items-center gap-2">
                               <Settings className="w-4 h-4" />
                               Edit

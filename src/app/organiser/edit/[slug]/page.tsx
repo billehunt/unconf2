@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Users, ExternalLink } from 'lucide-react';
 import { DeleteEventButton } from '@/components/delete-event-button';
+import { EventEditForm } from '@/components/event-edit-form';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 
@@ -11,13 +12,19 @@ import { logger } from '@/lib/logger';
 export const dynamic = 'force-dynamic';
 
 interface EventEditPageProps {
-  params: { eventId: string };
+  params: { slug: string };
 }
 
-async function getEventForEdit(eventId: string) {
+async function getEventForEdit(slug: string) {
   try {
-    const event = await prisma.event.findUnique({
-      where: { id: eventId },
+    // First try to find by friendly slug in settings
+    const eventBySlug = await prisma.event.findFirst({
+      where: {
+        settings: {
+          path: ['friendlySlug'],
+          equals: slug,
+        },
+      },
       include: {
         rooms: {
           orderBy: { sortOrder: 'asc' },
@@ -34,11 +41,34 @@ async function getEventForEdit(eventId: string) {
       },
     });
 
-    return event;
+    if (eventBySlug) {
+      return eventBySlug;
+    }
+
+    // Fallback to UUID lookup for backward compatibility
+    const eventById = await prisma.event.findUnique({
+      where: { id: slug },
+      include: {
+        rooms: {
+          orderBy: { sortOrder: 'asc' },
+        },
+        timeBlocks: {
+          orderBy: { sortOrder: 'asc' },
+        },
+        _count: {
+          select: {
+            topics: true,
+            attendees: true,
+          },
+        },
+      },
+    });
+
+    return eventById;
   } catch (error) {
     logger.error('Failed to fetch event for editing', error as Error, {
       component: 'event-edit-page',
-      eventId,
+      slug,
     });
     return null;
   }
@@ -62,7 +92,7 @@ function formatTime(date: Date): string {
 }
 
 export default async function EventEditPage({ params }: EventEditPageProps) {
-  const event = await getEventForEdit(params.eventId);
+  const event = await getEventForEdit(params.slug);
 
   if (!event) {
     notFound();
@@ -158,32 +188,14 @@ export default async function EventEditPage({ params }: EventEditPageProps) {
             </CardContent>
           </Card>
 
-          {/* Coming Soon */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  🚧 Full Edit Functionality Coming Soon
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                  The complete event editing interface is in development. For now, you can view event details here. 
-                  Advanced editing capabilities (modify rooms, time blocks, and event details) will be available soon.
-                </p>
-                <div className="flex gap-3 justify-center">
-                  <Button variant="outline" asChild>
-                    <Link href="/organiser">
-                      Create New Event
-                    </Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href={`/e/${friendlySlug || event.id}`}>
-                      Back to Event
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Event Edit Form */}
+          <EventEditForm 
+            event={event} 
+            onUpdate={() => {
+              // Refresh the page to show updated data
+              window.location.reload();
+            }} 
+          />
           
           {/* Danger Zone */}
           <Card className="border-red-200 dark:border-red-800">
@@ -209,7 +221,7 @@ export default async function EventEditPage({ params }: EventEditPageProps) {
 }
 
 export async function generateMetadata({ params }: EventEditPageProps) {
-  const event = await getEventForEdit(params.eventId);
+  const event = await getEventForEdit(params.slug);
   
   if (!event) {
     return {
