@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth, useUser, useIsAuthenticated, useIsOrganizer } from '@/components/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,19 +14,27 @@ export function AuthDebug() {
   const isAuthenticated = useIsAuthenticated();
   const isOrganizer = useIsOrganizer();
 
+  const [mounted, setMounted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
-    name: user?.user_metadata?.name || '',
-    email: user?.email || '',
+    name: '',
+    email: '',
   });
 
+  // Only run on client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Update edit data when user changes
-  React.useEffect(() => {
-    setEditData({
-      name: user?.user_metadata?.name || '',
-      email: user?.email || '',
-    });
-  }, [user]);
+  useEffect(() => {
+    if (mounted && user) {
+      setEditData({
+        name: user.user_metadata?.name || '',
+        email: user.email || '',
+      });
+    }
+  }, [mounted, user]);
 
   const handleSaveEdit = () => {
     if (state.isAnonymous) {
@@ -44,7 +52,8 @@ export function AuthDebug() {
     });
   };
 
-  if (state.loading) {
+  // Don't render until mounted to prevent SSR issues
+  if (!mounted || state.loading) {
     return (
       <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700">
         <div className="flex items-center space-x-3">

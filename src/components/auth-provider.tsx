@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useReducer, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useReducer, useCallback, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { 
   AuthState, 
@@ -92,31 +92,39 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [state, dispatch] = useReducer(authReducer, initialAuthState);
+  const [mounted, setMounted] = useState(false);
 
-  // Load anonymous user from localStorage
+  // Only run on client side
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Load anonymous user from localStorage (client-side only)
   const loadAnonymousUser = useCallback(() => {
-    if (typeof window === 'undefined') return null;
+    if (!mounted || typeof window === 'undefined') return null;
     
     try {
       const stored = localStorage.getItem(STORAGE_KEYS.ANONYMOUS_USER);
       return stored ? JSON.parse(stored) : null;
     } catch (error) {
       console.error('Failed to load anonymous user:', error);
-      localStorage.removeItem(STORAGE_KEYS.ANONYMOUS_USER);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(STORAGE_KEYS.ANONYMOUS_USER);
+      }
       return null;
     }
-  }, []);
+  }, [mounted]);
 
-  // Save anonymous user to localStorage
+  // Save anonymous user to localStorage (client-side only)
   const saveAnonymousUser = useCallback((user: AnonymousUser) => {
-    if (typeof window === 'undefined') return;
+    if (!mounted || typeof window === 'undefined') return;
     
     try {
       localStorage.setItem(STORAGE_KEYS.ANONYMOUS_USER, JSON.stringify(user));
     } catch (error) {
       console.error('Failed to save anonymous user:', error);
     }
-  }, []);
+  }, [mounted]);
 
   // Sign in anonymously
   const signInAnonymously = useCallback(async (userData?: { 
@@ -124,6 +132,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     email?: string; 
     eventId?: string;
   }) => {
+    if (!mounted) return;
+
     // Check if we already have an anonymous user
     let anonUser = loadAnonymousUser();
     
@@ -153,10 +163,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     dispatch({ type: 'SET_ANONYMOUS_USER', user: anonUser });
-  }, [loadAnonymousUser, saveAnonymousUser]);
+  }, [mounted, loadAnonymousUser, saveAnonymousUser]);
 
   // Sign in with email/password
   const signInWithEmail = useCallback(async (email: string, password: string) => {
+    if (!mounted) return { error: 'Not mounted' };
+
     dispatch({ type: 'SET_LOADING', loading: true });
     
     const { error } = await supabase.auth.signInWithPassword({
@@ -175,7 +187,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     return { error: null };
-  }, []);
+  }, [mounted]);
 
   // Sign up with email/password
   const signUp = useCallback(async (
@@ -183,6 +195,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     password: string, 
     userData?: { name?: string }
   ) => {
+    if (!mounted) return { error: 'Not mounted' };
+
     dispatch({ type: 'SET_LOADING', loading: true });
     
     const { error } = await supabase.auth.signUp({
@@ -207,10 +221,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     return { error: null };
-  }, []);
+  }, [mounted]);
 
   // Sign out
   const signOut = useCallback(async () => {
+    if (!mounted) return;
+
     dispatch({ type: 'SET_LOADING', loading: true });
     
     // Clear local storage
@@ -225,11 +241,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     dispatch({ type: 'CLEAR_SESSION' });
-  }, [state.isAnonymous]);
+  }, [mounted, state.isAnonymous]);
 
   // Update anonymous user data
   const updateAnonymousUser = useCallback((userData: Partial<AnonymousUser['user_metadata']>) => {
-    if (!state.isAnonymous || !state.user) return;
+    if (!mounted || !state.isAnonymous || !state.user) return;
 
     const updatedUser = {
       ...state.user,
@@ -241,10 +257,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     saveAnonymousUser(updatedUser);
     dispatch({ type: 'SET_ANONYMOUS_USER', user: updatedUser });
-  }, [state.isAnonymous, state.user, saveAnonymousUser]);
+  }, [mounted, state.isAnonymous, state.user, saveAnonymousUser]);
 
-  // Initialize auth state
+  // Initialize auth state (client-side only)
   useEffect(() => {
+    if (!mounted) return;
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
@@ -291,7 +309,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
 
     return () => subscription.unsubscribe();
-  }, [loadAnonymousUser]);
+  }, [mounted, loadAnonymousUser]);
+
+  // Don't render anything until mounted (prevents SSR issues)
+  if (!mounted) {
+    return (
+      <AuthContext.Provider value={{
+        state: initialAuthState,
+        signInAnonymously: async () => {},
+        signInWithEmail: async () => ({ error: 'Not mounted' }),
+        signUp: async () => ({ error: 'Not mounted' }),
+        signOut: async () => {},
+        updateAnonymousUser: () => {},
+      }}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
 
   const value = {
     state,
