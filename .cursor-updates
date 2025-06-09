@@ -52,3 +52,11 @@ Successfully created comprehensive AppShell component with sticky header, respon
 
 **Rule for future projects:** Install theme management early in development to avoid hydration issues later. Use ShadCN component patterns consistently for UI cohesion. Structure app shell to be layout-agnostic so individual pages don't need to handle common UI elements like headers, footers, or notifications.
 
+# Fixed Critical UI Rendering Issues and Navigation
+
+Resolved major UI problems including broken SVG icons rendering as huge black shapes and non-functional header navigation. Replaced all inline SVG icons with proper Lucide React components (Calendar, Vote, Lightbulb, FileText) which render correctly with proper sizing. Fixed header navigation links to point to actual routes (/, /setup, /showcase) instead of placeholder "#" anchors. Theme toggle now displays proper icons instead of "Toggle theme" text.
+
+**Icon Implementation Learning:** Inline SVG elements can fail to render properly in Next.js SSR environments, appearing as large black shapes. Lucide React components are more reliable as they're specifically designed for React applications and handle SSR correctly. Always prefer component libraries over inline SVGs for consistency.
+
+**Rule for future projects:** Use established icon component libraries (Lucide React, Heroicons, etc.) instead of inline SVG code to avoid rendering issues. Test icon rendering in both development and production builds. Ensure all navigation links point to actual routes from the start rather than using placeholder anchors that confuse users during development.
+
