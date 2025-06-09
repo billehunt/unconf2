@@ -3,7 +3,7 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -63,17 +63,20 @@ interface SortableRoomItemProps {
   errors: ReturnType<typeof useForm<RoomsForm>>['formState']['errors'];
   onRemove: (index: number) => void;
   canRemove: boolean;
+  isDragEnabled?: boolean;
 }
 
-function SortableRoomItem({ index, register, errors, onRemove, canRemove }: SortableRoomItemProps) {
+function SortableRoomItem({ index, register, errors, onRemove, canRemove, isDragEnabled = true }: SortableRoomItemProps) {
+  const sortable = isDragEnabled ? useSortable({ id: `room-${index}` }) : null;
+  
   const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: `room-${index}` });
+    attributes = {},
+    listeners = {},
+    setNodeRef = () => {},
+    transform = null,
+    transition = '',
+    isDragging = false,
+  } = sortable || {};
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -86,15 +89,21 @@ function SortableRoomItem({ index, register, errors, onRemove, canRemove }: Sort
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           {/* Drag Handle */}
-          <div
-            {...attributes}
-            {...listeners}
-            className="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none"
-            tabIndex={0}
-            aria-label={`Drag to reorder room ${index + 1}`}
-          >
-            <GripVertical className="w-4 h-4" />
-          </div>
+          {isDragEnabled ? (
+            <div
+              {...attributes}
+              {...listeners}
+              className="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none"
+              tabIndex={0}
+              aria-label={`Drag to reorder room ${index + 1}`}
+            >
+              <GripVertical className="w-4 h-4" />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-8 h-8 text-gray-300">
+              <GripVertical className="w-4 h-4" />
+            </div>
+          )}
 
           {/* Room Fields */}
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -167,6 +176,8 @@ function SortableRoomItem({ index, register, errors, onRemove, canRemove }: Sort
 }
 
 export function RoomsStep({ data, onDataChange, onNext, onPrev, isLoading }: RoomsStepProps) {
+  const [mounted, setMounted] = useState(false);
+  
   const form = useForm<RoomsForm>({
     resolver: zodResolver(roomsSchema),
     defaultValues: {
@@ -183,6 +194,11 @@ export function RoomsStep({ data, onDataChange, onNext, onPrev, isLoading }: Roo
 
   // Watch form values for auto-saving
   const watchedValues = watch();
+
+  // Set mounted state after component mounts to prevent SSR issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Auto-save form data when values change
   useEffect(() => {
@@ -289,29 +305,46 @@ export function RoomsStep({ data, onDataChange, onNext, onPrev, isLoading }: Roo
             </Button>
           </div>
 
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={fields.map((_, index) => `room-${index}`)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-3">
-                                 {fields.map((field, index) => (
-                   <SortableRoomItem
-                     key={field.id}
-                     index={index}
-                     register={register}
-                     errors={errors}
-                     onRemove={removeRoom}
-                     canRemove={fields.length > 1}
-                   />
-                 ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+                     {mounted ? (
+             <DndContext
+               sensors={sensors}
+               collisionDetection={closestCenter}
+               onDragEnd={handleDragEnd}
+             >
+               <SortableContext
+                 items={fields.map((_, index) => `room-${index}`)}
+                 strategy={verticalListSortingStrategy}
+               >
+                 <div className="space-y-3">
+                   {fields.map((field, index) => (
+                     <SortableRoomItem
+                       key={field.id}
+                       index={index}
+                       register={register}
+                       errors={errors}
+                       onRemove={removeRoom}
+                       canRemove={fields.length > 1}
+                       isDragEnabled={true}
+                     />
+                   ))}
+                 </div>
+               </SortableContext>
+             </DndContext>
+           ) : (
+             <div className="space-y-3">
+               {fields.map((field, index) => (
+                 <SortableRoomItem
+                   key={field.id}
+                   index={index}
+                   register={register}
+                   errors={errors}
+                   onRemove={removeRoom}
+                   canRemove={fields.length > 1}
+                   isDragEnabled={false}
+                 />
+               ))}
+             </div>
+           )}
 
           {errors.rooms && typeof errors.rooms.message === 'string' && (
             <p className="text-sm text-red-600 dark:text-red-400">{errors.rooms.message}</p>

@@ -63,7 +63,7 @@ alwaysApply: true
 
 Never stop or restart the user’s dev server.
 - Before running tests or verifications, open a new terminal and start:  
-   - PORT=4001 npm run dev -- -p 4001  # use its own port  (keep it running in the background).
+   - pkill -f "PORT=4001" && PORT=4001 npm run dev -- -p 4001  # use its own port
    - Wait until http://localhost:4001 responds with HTTP 200, then continue.  
    - Execute all checks/test-suites against http://localhost:4001.  
    - After verification, kill only the process you started (grep “PORT=4001”).  
