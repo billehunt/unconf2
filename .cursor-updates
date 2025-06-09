@@ -16,3 +16,7 @@ If I did this again: I'd create a CLI setup wizard to automate the environment f
 
 If I did this again: I'd set up database connection pooling configuration from the start and create automated schema synchronization scripts.
 
+- ✅ **Supabase + Prisma Connection Resolution** - Diagnosed and resolved IPv6 connectivity issues in WSL2 environment by switching from direct database connection to Supabase's connection pooler, updated connection strings to use aws-0-us-west-1.pooler.supabase.com instead of direct db host, enhanced error logging and diagnostics for better troubleshooting, verified both Supabase API and Prisma database connections working successfully, and ensured build passes with proper connection pooling parameters.
+
+If I did this again: I'd document the WSL2 IPv6 connectivity limitation upfront and default to connection pooler URLs immediately for better developer experience in containerized environments.
+

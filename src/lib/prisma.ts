@@ -22,13 +22,40 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Connection test function
 export const testPrismaConnection = async () => {
+  // First check if environment variables are set
+  const databaseUrl = process.env.DATABASE_URL;
+  const directUrl = process.env.DIRECT_URL;
+  
+  if (!databaseUrl) {
+    return {
+      success: false,
+      message: 'DATABASE_URL not configured',
+      details: 'Please add DATABASE_URL to your .env.local file',
+    };
+  }
+  
+  if (!directUrl) {
+    return {
+      success: false,
+      message: 'DIRECT_URL not configured', 
+      details: 'Please add DIRECT_URL to your .env.local file',
+    };
+  }
+
   try {
+    console.log('Testing Prisma connection...');
+    console.log('DATABASE_URL present:', !!databaseUrl);
+    console.log('DIRECT_URL present:', !!directUrl);
+    
     await prisma.$connect();
+    console.log('Prisma connected successfully');
 
     // Test with a simple query
     const result = await prisma.$queryRaw`SELECT 1 as test`;
+    console.log('Query result:', result);
 
     await prisma.$disconnect();
+    console.log('Prisma disconnected successfully');
 
     return {
       success: true,
@@ -36,8 +63,34 @@ export const testPrismaConnection = async () => {
       details: `Database query returned: ${JSON.stringify(result)}`,
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
+    console.error('Prisma connection error:', error);
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    
+    // Check for common connection issues and provide helpful messages
+    if (errorMessage.includes('ENOTFOUND')) {
+      return {
+        success: false,
+        message: 'Database host not found',
+        details: 'Check your Supabase project ID in DATABASE_URL and DIRECT_URL',
+      };
+    }
+    
+    if (errorMessage.includes('authentication failed')) {
+      return {
+        success: false,
+        message: 'Authentication failed',
+        details: 'Check your database password in DATABASE_URL and DIRECT_URL',
+      };
+    }
+    
+    if (errorMessage.includes('timeout')) {
+      return {
+        success: false,
+        message: 'Connection timeout',
+        details: 'Database connection timed out. Check if your Supabase project is active.',
+      };
+    }
 
     return {
       success: false,

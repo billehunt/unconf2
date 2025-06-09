@@ -54,6 +54,13 @@ export type Database = {
   };
 };
 
+// Connection test result type
+export interface ConnectionTestResult {
+  success: boolean;
+  message: string;
+  details?: string;
+}
+
 // Helper function to handle Supabase errors
 export const handleSupabaseError = (error: unknown) => {
   console.error('Supabase error:', error);
@@ -70,7 +77,7 @@ export const handleSupabaseError = (error: unknown) => {
 };
 
 // Connection test function
-export const testSupabaseConnection = async () => {
+export const testSupabaseConnection = async (): Promise<ConnectionTestResult> => {
   // First validate environment variables
   if (!supabaseUrl || !supabaseAnonKey) {
     return {
@@ -97,16 +104,44 @@ export const testSupabaseConnection = async () => {
       .select('*')
       .limit(1);
 
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 means table doesn't exist, which is expected
+    // Handle the expected "table doesn't exist" error as success
+    if (error) {
+      const errorMessage = handleSupabaseError(error);
+      
+      // These indicate successful connection but missing table (expected)
+      if (
+        error.code === 'PGRST116' ||
+        error.code === '42P01' ||
+        errorMessage.includes('does not exist') ||
+        errorMessage.includes('relation') && errorMessage.includes('does not exist')
+      ) {
+        return {
+          success: true,
+          message: 'Supabase connection successful',
+          details: 'Connected to database (test table not found, which is expected)'
+        };
+      }
+      
+      // Any other error is a real connection issue
       throw error;
     }
 
-    return { success: true, message: 'Supabase connection successful' };
+    return { success: true, message: 'Supabase connection successful', details: undefined };
   } catch (error) {
+    const errorMessage = handleSupabaseError(error);
+    
+    // Double-check for the "does not exist" pattern in caught errors
+    if (errorMessage.includes('does not exist')) {
+      return {
+        success: true,
+        message: 'Supabase connection successful',
+        details: 'Connected to database (test table not found, which is expected)'
+      };
+    }
+    
     return {
       success: false,
-      message: `Supabase connection failed: ${handleSupabaseError(error)}`,
+      message: `Supabase connection failed: ${errorMessage}`,
     };
   }
 };

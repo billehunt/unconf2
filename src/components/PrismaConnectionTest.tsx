@@ -24,17 +24,11 @@ export function PrismaConnectionTest() {
   });
 
   useEffect(() => {
-    // Check environment variables on mount (only client-side env vars)
-    const databaseUrl = process.env.DATABASE_URL || 'Not set';
-    const directUrl = process.env.DIRECT_URL || 'Not set';
-
+    // Note: DATABASE_URL and DIRECT_URL are server-side only for security
+    // We'll check them via the API test instead
     setEnvVars({
-      databaseUrl:
-        databaseUrl !== 'Not set'
-          ? `${databaseUrl.slice(0, 30)}...`
-          : 'Not set',
-      directUrl:
-        directUrl !== 'Not set' ? `${directUrl.slice(0, 30)}...` : 'Not set',
+      databaseUrl: 'Server-side only (secure)',
+      directUrl: 'Server-side only (secure)',
     });
   }, []);
 
@@ -169,14 +163,20 @@ export function PrismaConnectionTest() {
             <h5 className="text-sm font-medium text-destructive mb-2">
               Database Setup Required
             </h5>
-            <ul className="text-xs text-muted-foreground space-y-1">
-              <li>1. Ensure your Supabase project is created</li>
-              <li>2. Add DATABASE_URL and DIRECT_URL to .env.local</li>
-              <li>3. Get database password from Supabase settings</li>
-              <li>4. Run npx prisma generate to update client</li>
-            </ul>
+            <div className="text-xs text-muted-foreground space-y-2">
+              <p><strong>Add these to your .env.local file:</strong></p>
+              <pre className="bg-background p-2 rounded text-xs font-mono">
+{`DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT_REF.supabase.co:5432/postgres?connection_limit=1&pool_timeout=10"
+DIRECT_URL="postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT_REF.supabase.co:5432/postgres"`}
+              </pre>
+              <ul className="space-y-1 mt-2">
+                <li>• Replace YOUR_PASSWORD with your Supabase database password</li>
+                <li>• Replace YOUR_PROJECT_REF with your Supabase project ID</li>
+                <li>• Restart your dev server after adding these variables</li>
+              </ul>
+            </div>
             <p className="text-xs text-muted-foreground mt-2">
-              See docs/supabase-setup.md for database connection details.
+              See docs/supabase-setup.md for detailed instructions.
             </p>
           </div>
         )}

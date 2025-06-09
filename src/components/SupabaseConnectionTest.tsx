@@ -56,8 +56,8 @@ export function SupabaseConnectionTest() {
       if (result.success) {
         setConnectionStatus({
           status: 'success',
-          message: 'Connection successful!',
-          details: 'Supabase client is properly configured and connected.',
+          message: result.message || 'Connection successful!',
+          details: result.details || 'Supabase client is properly configured and connected.',
         });
       } else {
         setConnectionStatus({
