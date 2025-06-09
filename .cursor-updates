@@ -44,3 +44,11 @@ Completed all 9 data modeling tasks including Event, Room, TimeBlock, Topic, Att
 
 **Rule for future projects:** Always use project-specific npm scripts for Prisma commands (db:studio, db:migrate, db:seed) rather than direct npx commands, as they ensure proper environment variable loading. Set up database testing early with both Prisma Studio and API endpoints to validate connectivity from multiple angles. Document environment setup clearly to avoid credential overwrites during template copying.
 
+# Implemented AppShell with Complete UI Foundation
+
+Successfully created comprehensive AppShell component with sticky header, responsive container, toast notifications, and dark mode toggle. Integrated next-themes for theme management with system preference detection. Header includes placeholder navigation and branding with proper responsive design. Toast system uses ShadCN components with proper accessibility. Dark mode toggle provides light/dark/system options via dropdown menu.
+
+**Component Architecture Insight:** AppShell pattern provides clean separation of layout concerns from page content. Sticky header with backdrop blur gives modern glassmorphism effect while maintaining readability. Toast positioning outside main content prevents layout shifts during notifications.
+
+**Rule for future projects:** Install theme management early in development to avoid hydration issues later. Use ShadCN component patterns consistently for UI cohesion. Structure app shell to be layout-agnostic so individual pages don't need to handle common UI elements like headers, footers, or notifications.
+
