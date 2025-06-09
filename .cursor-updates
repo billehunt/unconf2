@@ -84,3 +84,9 @@ Fixed complete styling failure caused by conflicting Tailwind CSS v3 and v4 depe
 
 **Rule for future projects:** Maintain consistent major versions across related dependencies (e.g., all Tailwind packages should be v3 OR v4, not mixed). Check package.json carefully when adding new CSS framework features. Use exact version pinning for critical styling dependencies. Test both build AND runtime after resolving dependency conflicts. Create placeholder pages for all navigation links early to prevent build failures during development.
 
+# Implemented Global React Query Provider with Supabase Realtime Integration
+
+Successfully installed @tanstack/react-query and @tanstack/react-query-devtools, created comprehensive QueryClient configuration with optimized stale/retry times (5min stale, 10min cache, 3 retries with exponential backoff), implemented intelligent retry logic that avoids retrying 4xx client errors, integrated Supabase Realtime websocket listeners for automatic query invalidation across all tables (Event, Room, Topic, Vote, Session, Note, Attendee), created utility hooks for common query operations and cache management, and added QueryProvider to the app layout hierarchy. Build passes successfully with proper TypeScript error handling and linting compliance.
+
+**Rule for future projects:** Configure React Query defaults thoughtfully from the start - longer stale times reduce unnecessary network requests while shorter cache times prevent memory bloat. When integrating with realtime systems like Supabase, set up automatic query invalidation immediately to ensure UI stays synchronized with database changes. Create query key factories early to maintain consistent caching patterns across the application. Always handle unknown error types properly in retry logic to avoid TypeScript linting issues.
+
