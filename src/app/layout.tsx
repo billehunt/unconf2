@@ -5,6 +5,7 @@ import { PageErrorBoundary } from '@/components/error-boundary';
 import { GlobalErrorHandler } from '@/components/global-error-handler';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AppShell } from '@/components/app-shell';
+import { AuthProvider } from '@/components/auth-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,12 +28,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <GlobalErrorHandler />
-          <PageErrorBoundary context={{ route: 'root' }}>
-            <AppShell>
-              {children}
-            </AppShell>
-          </PageErrorBoundary>
+          <AuthProvider>
+            <GlobalErrorHandler />
+            <PageErrorBoundary context={{ route: 'root' }}>
+              <AppShell>
+                {children}
+              </AppShell>
+            </PageErrorBoundary>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

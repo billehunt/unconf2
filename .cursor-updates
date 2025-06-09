@@ -60,3 +60,11 @@ Resolved major UI problems including broken SVG icons rendering as huge black sh
 
 **Rule for future projects:** Use established icon component libraries (Lucide React, Heroicons, etc.) instead of inline SVG code to avoid rendering issues. Test icon rendering in both development and production builds. Ensure all navigation links point to actual routes from the start rather than using placeholder anchors that confuse users during development.
 
+# Implemented Comprehensive Supabase Auth Wrapper
+
+Successfully implemented client-only authentication system supporting both anonymous sessions for attendees and JWT-based authentication for organizers. Created AuthProvider context with React useReducer for state management, supporting anonymous user persistence via localStorage and seamless transitions between anonymous and authenticated states. Auth wrapper provides hooks (useAuth, useUser, useSession, useIsAuthenticated, useIsOrganizer) for easy component integration. Header displays auth status with "Join Event" button for anonymous users and user badge plus sign out for authenticated users.
+
+**Authentication Architecture Insight:** Anonymous sessions require careful localStorage management to persist user data across page reloads while maintaining the ability to upgrade to authenticated sessions. Reducer pattern works well for complex auth state with multiple user types (anonymous attendees, authenticated organizers). Auth context placement outside AppShell but inside ThemeProvider ensures auth state is available throughout the app while maintaining proper component hierarchy.
+
+**Rule for future projects:** Design auth systems with anonymous users as first-class citizens rather than afterthoughts. Use TypeScript discriminated unions for user types to ensure type safety. Implement auth state as early as possible in the component tree but after essential providers like theme. Create comprehensive auth debug components during development to test all auth flows including sign in, sign out, and state transitions.
+

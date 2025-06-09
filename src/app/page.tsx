@@ -1,8 +1,14 @@
 import { Calendar, Vote, Lightbulb, FileText } from 'lucide-react';
+import { AuthDebug } from '@/components/auth-debug';
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/50 to-primary/5">
+      {/* Auth Debug Section - for development */}
+      <div className="mb-8">
+        <AuthDebug />
+      </div>
+
       {/* Hero Section */}
       <div className="py-16">
         <div className="text-center space-y-8">

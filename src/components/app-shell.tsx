@@ -3,6 +3,9 @@
 import * as React from "react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Toaster } from "@/components/ui/toaster"
+import { Button } from "@/components/ui/button"
+import { useAuth, useUser, useIsAuthenticated } from "@/components/auth-provider"
+import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 interface AppShellProps {
@@ -11,6 +14,10 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, className }: AppShellProps) {
+  const { signInAnonymously, signOut } = useAuth()
+  const user = useUser()
+  const isAuthenticated = useIsAuthenticated()
+
   return (
     <div className={cn("min-h-screen bg-background", className)}>
       {/* Header */}
@@ -52,6 +59,32 @@ export function AppShell({ children, className }: AppShellProps) {
 
             {/* Actions */}
             <div className="flex items-center space-x-3">
+              {/* Auth Status */}
+              {user ? (
+                <div className="flex items-center space-x-2">
+                  <Badge variant={isAuthenticated ? "default" : "secondary"} className="text-xs">
+                    {user.user_metadata?.name || user.email || "Anonymous"}
+                  </Badge>
+                  <Button
+                    onClick={signOut}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-8"
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => signInAnonymously({ name: "Attendee" })}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-8"
+                >
+                  Join Event
+                </Button>
+              )}
+              
               <ThemeToggle />
             </div>
           </div>
