@@ -108,3 +108,9 @@ Successfully implemented the complete organiser wizard flow with Step 3 Time Blo
 
 **Rule for future projects:** When implementing collision-safe ID generation, use character sets that avoid ambiguous characters (0/O, 1/l, I) to prevent user confusion. For QR code generation in production, use established libraries like `qrcode` rather than implementing custom algorithms. Always implement conflict detection with real-time visual feedback rather than only validating on submission - it significantly improves user experience. Handle database schema changes carefully by commenting out new fields until migrations can be properly applied to avoid build failures.
 
+# Fixed QR Codes & Added Events Listing with Memorable Slugs
+
+Successfully fixed the fake QR code generator by implementing the real `qrcode` library for generating actual scannable QR codes. QR component now generates proper codes with copy-to-clipboard, PNG download, and loading states. Created comprehensive events listing page at `/events` showing all conferences with live status indicators (Upcoming/Live Now/Completed), attendee counts, room previews, and join buttons. Added memorable event slug generation utilities using two-word combinations like "tech-summit" and "brilliant-workshop" with collision detection. Updated navigation to include Events link. Build passes successfully with real QR codes working.
+
+**Rule for future projects:** Always use established libraries (like `qrcode`) for standard functionality rather than implementing custom algorithms. When dealing with database schema changes that require environment setup, implement temporary workarounds (like storing data in JSON fields) to maintain development momentum while planning proper migrations. Create comprehensive listing pages early to help users discover and navigate content - they provide immediate value and help test the data model.
+

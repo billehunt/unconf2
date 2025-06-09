@@ -44,6 +44,12 @@ export function AppShell({ children, className }: AppShellProps) {
                 Home
               </a>
               <a 
+                href="/events" 
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Events
+              </a>
+              <a 
                 href="/organiser" 
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
@@ -54,12 +60,6 @@ export function AppShell({ children, className }: AppShellProps) {
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Setup
-              </a>
-              <a 
-                href="/showcase" 
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Demo
               </a>
             </nav>
 

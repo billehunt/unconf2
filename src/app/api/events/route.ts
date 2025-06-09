@@ -1,59 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
-
-// Generate a collision-safe 6-character short ID
-function generateShortId(): string {
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  let result = '';
-  for (let i = 0; i < 6; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
-// Check if short ID is unique, retry if collision
-async function getUniqueShortId(): Promise<string> {
-  let attempts = 0;
-  const maxAttempts = 10;
-  
-  while (attempts < maxAttempts) {
-    const shortId = generateShortId();
-    
-    try {
-      // TODO: Update to use shortId once migration is applied
-      // For now, checking against id field as workaround
-      const existing = await prisma.event.findFirst({
-        where: { 
-          OR: [
-            { id: shortId },
-            // { shortId: shortId }, // Uncomment once migration is applied
-          ]
-        },
-      });
-      
-      if (!existing) {
-        return shortId;
-      }
-      
-      attempts++;
-      logger.warn('ShortId collision detected, retrying', {
-        component: 'events-api',
-        shortId,
-        attempt: attempts,
-      });
-    } catch (error) {
-      logger.error('Error checking shortId uniqueness', error as Error, {
-        component: 'events-api',
-        shortId,
-      });
-      attempts++;
-    }
-  }
-  
-  // Fallback to UUID if all attempts fail
-  throw new Error('Failed to generate unique shortId after maximum attempts');
-}
+import { generateEventSlug } from '@/lib/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,19 +34,20 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Generate unique short ID
-    const shortId = await getUniqueShortId();
+    // Generate memorable slug for future use (store in settings for now)
+    const friendlySlug = generateEventSlug();
     
     // Create event with relations
     const event = await prisma.event.create({
       data: {
-        // shortId, // TODO: Uncomment once migration is applied
         title,
         startsAt,
         endsAt,
         createdBy: 'organiser', // TODO: Use actual user ID from auth
         wizardStage: 3, // Completed wizard
-        settings: {},
+        settings: {
+          friendlySlug, // Store the memorable slug in settings for now
+        },
         rooms: {
           create: rooms?.map((room: any, index: number) => ({
             name: room.name,
@@ -123,7 +72,7 @@ export async function POST(request: NextRequest) {
     logger.info('Event created successfully', {
       component: 'events-api',
       eventId: event.id,
-      shortId: shortId, // Using generated shortId temporarily
+      friendlySlug,
       title: event.title,
     });
     
@@ -131,12 +80,12 @@ export async function POST(request: NextRequest) {
       success: true,
       event: {
         id: event.id,
-        shortId: shortId, // TODO: Use event.shortId once migration is applied
+        shortId: friendlySlug, // Return the friendly slug for display
         title: event.title,
         startsAt: event.startsAt,
         endsAt: event.endsAt,
-        accessUrl: `/e/${event.id}`, // TODO: Use shortId once migration is applied
-        qrUrl: `/e/${event.id}`, // TODO: Use shortId once migration is applied
+        accessUrl: `/e/${event.id}`, // Use ID for now until we can migrate the schema
+        qrUrl: `/e/${event.id}`,
       },
     });
     

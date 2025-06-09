@@ -23,13 +23,13 @@ datasource db {
 // Event model - core entity for unconference events
 model Event {
   id String @id @default(uuid())
-  // shortId String @unique // 6-character collision-safe URL slug (TODO: Add via migration)
+  // shortId String @unique // TODO: Add memorable two-word URL slug like "tech-summit"
   title String
   startsAt DateTime
   endsAt DateTime
   createdBy String
   wizardStage Int @default(0)
-  settings Json @default("{}")
+  settings Json @default("{}") // Currently storing friendlySlug here temporarily
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

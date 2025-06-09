@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Copy, Download, Check, QrCode } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import QRCodeLib from 'qrcode';
 
 interface QRCodeProps {
   value: string;
@@ -13,67 +14,72 @@ interface QRCodeProps {
   className?: string;
 }
 
-// Simple QR code generation using qr-code-generator library pattern
-// For a production app, you might want to use a proper QR library like 'qrcode'
-function generateQRCodeSVG(text: string, size: number = 200) {
-  // This is a simplified QR code generator for demo purposes
-  // In a real implementation, use a proper QR library
-  const modules = 25; // QR code grid size
-  const moduleSize = size / modules;
-  const padding = moduleSize;
-  
-  // Simple pattern generator (this is not a real QR code algorithm)
-  // For production, use a proper QR code library
-  const getModulePattern = (row: number, col: number): boolean => {
-    // Create a deterministic pattern based on the text hash
-    const hash = text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return ((row + col + hash) % 3) === 0 || 
-           ((row * col + hash) % 5) === 0 ||
-           (row < 7 && col < 7) || // Top-left finder pattern
-           (row < 7 && col >= modules - 7) || // Top-right finder pattern
-           (row >= modules - 7 && col < 7); // Bottom-left finder pattern
-  };
-  
-  let pathData = '';
-  
-  for (let row = 0; row < modules; row++) {
-    for (let col = 0; col < modules; col++) {
-      if (getModulePattern(row, col)) {
-        const x = padding + col * moduleSize;
-        const y = padding + row * moduleSize;
-        pathData += `M${x},${y}h${moduleSize}v${moduleSize}h-${moduleSize}z`;
-      }
-    }
-  }
-  
-  const totalSize = size + 2 * padding;
-  
-  return `
-    <svg width="${totalSize}" height="${totalSize}" viewBox="0 0 ${totalSize} ${totalSize}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="${totalSize}" height="${totalSize}" fill="white"/>
-      <path d="${pathData}" fill="black"/>
-    </svg>
-  `;
-}
-
 export function QRCode({ value, size = 200, title, className = '' }: QRCodeProps) {
   const [copySuccess, setCopySuccess] = useState(false);
-  const [svgContent, setSvgContent] = useState<string>('');
-  const svgRef = useRef<HTMLDivElement>(null);
+  const [qrCodeDataURL, setQrCodeDataURL] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Generate the full URL for the QR code
+  const fullUrl = typeof window !== 'undefined' ? `${window.location.origin}${value}` : value;
   
   useEffect(() => {
-    const svg = generateQRCodeSVG(value, size);
-    setSvgContent(svg);
-  }, [value, size]);
+    const generateQRCode = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Generate QR code as data URL for display
+        const dataURL = await QRCodeLib.toDataURL(fullUrl, {
+          width: size,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          },
+          errorCorrectionLevel: 'M'
+        });
+        
+        setQrCodeDataURL(dataURL);
+        
+        // Also draw on canvas for PNG download
+        if (canvasRef.current) {
+          await QRCodeLib.toCanvas(canvasRef.current, fullUrl, {
+            width: size,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF'
+            },
+            errorCorrectionLevel: 'M'
+          });
+        }
+        
+        logger.debug('QR code generated successfully', {
+          component: 'qr-code',
+          url: fullUrl,
+          size,
+        });
+      } catch (error) {
+        logger.error('Failed to generate QR code', error as Error, {
+          component: 'qr-code',
+          url: fullUrl,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    generateQRCode();
+  }, [fullUrl, size]);
   
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(value);
+      await navigator.clipboard.writeText(fullUrl);
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
       logger.debug('Link copied to clipboard', {
         component: 'qr-code',
-        value,
+        url: fullUrl,
       });
     } catch (error) {
       logger.error('Failed to copy to clipboard', error as Error, {
@@ -82,45 +88,25 @@ export function QRCode({ value, size = 200, title, className = '' }: QRCodeProps
     }
   };
   
-  const downloadPNG = async () => {
+  const downloadPNG = () => {
     try {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Could not get canvas context');
+      if (!canvasRef.current) {
+        throw new Error('Canvas not available');
+      }
       
-      const img = new Image();
-      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(svgBlob);
-      
-      img.onload = () => {
-        canvas.width = size + 40; // Add padding
-        canvas.height = size + 40;
-        
-        // White background
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw QR code
-        ctx.drawImage(img, 20, 20, size, size);
-        
-        // Convert to PNG and download
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const downloadUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.download = `qr-code-${title || 'event'}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(downloadUrl);
-          }
-        }, 'image/png');
-        
-        URL.revokeObjectURL(url);
-      };
-      
-      img.src = url;
+      // Convert canvas to blob and download
+      canvasRef.current.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `qr-code-${title || 'event'}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png');
       
       logger.debug('QR code downloaded', {
         component: 'qr-code',
@@ -151,18 +137,50 @@ export function QRCode({ value, size = 200, title, className = '' }: QRCodeProps
           
           {/* QR Code Display */}
           <div className="flex justify-center">
-            <div 
-              ref={svgRef}
-              className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white"
-              dangerouslySetInnerHTML={{ __html: svgContent }}
-            />
+            <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white">
+              {isLoading ? (
+                <div 
+                  className="flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded"
+                  style={{ width: size, height: size }}
+                >
+                  <div className="text-gray-500 dark:text-gray-400 text-sm">
+                    Generating QR...
+                  </div>
+                </div>
+              ) : qrCodeDataURL ? (
+                <img 
+                  src={qrCodeDataURL} 
+                  alt={`QR Code for ${title || 'event'}`}
+                  width={size}
+                  height={size}
+                  className="block"
+                />
+              ) : (
+                <div 
+                  className="flex items-center justify-center bg-red-100 dark:bg-red-900 rounded"
+                  style={{ width: size, height: size }}
+                >
+                  <div className="text-red-600 dark:text-red-400 text-sm text-center">
+                    Failed to generate QR code
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+          
+          {/* Hidden canvas for PNG download */}
+          <canvas 
+            ref={canvasRef} 
+            style={{ display: 'none' }}
+            width={size}
+            height={size}
+          />
           
           {/* Event URL */}
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Event URL:</p>
             <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded break-all">
-              {typeof window !== 'undefined' ? `${window.location.origin}${value}` : value}
+              {fullUrl}
             </code>
           </div>
           
@@ -191,6 +209,7 @@ export function QRCode({ value, size = 200, title, className = '' }: QRCodeProps
               variant="outline"
               size="sm"
               onClick={downloadPNG}
+              disabled={isLoading || !qrCodeDataURL}
               className="flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
