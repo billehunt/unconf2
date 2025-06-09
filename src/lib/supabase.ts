@@ -1,40 +1,34 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Validate environment variables
+// Get environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Missing Supabase environment variables. Please check your .env.local file.\n' +
-      'Required variables:\n' +
-      '- NEXT_PUBLIC_SUPABASE_URL\n' +
-      '- NEXT_PUBLIC_SUPABASE_ANON_KEY\n\n' +
-      'See the setup instructions in docs/supabase-setup.md'
-  );
-}
-
-// Create Supabase client for client-side operations
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10,
+// Create Supabase client for client-side operations (with fallback for missing env vars)
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-key',
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
     },
-  },
-});
+    realtime: {
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+  }
+);
 
 // Server-side client with service role key (for admin operations)
 export const createServiceSupabase = () => {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!serviceRoleKey) {
+  
+  if (!serviceRoleKey || !supabaseUrl) {
     throw new Error(
-      'SUPABASE_SERVICE_ROLE_KEY is required for server-side operations'
+      'SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_URL are required for server-side operations'
     );
   }
 
@@ -77,6 +71,24 @@ export const handleSupabaseError = (error: unknown) => {
 
 // Connection test function
 export const testSupabaseConnection = async () => {
+  // First validate environment variables
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return {
+      success: false,
+      message: 'Missing environment variables. Please configure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file.',
+    };
+  }
+
+  if (
+    supabaseUrl === 'https://placeholder.supabase.co' ||
+    supabaseAnonKey === 'placeholder-key'
+  ) {
+    return {
+      success: false,
+      message: 'Placeholder values detected. Please replace with your actual Supabase credentials.',
+    };
+  }
+
   try {
     const { error } = await supabase
       .from('_test_connection')
