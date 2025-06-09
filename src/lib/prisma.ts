@@ -142,10 +142,82 @@ export const healthCheck = async () => {
 };
 
 // Export types for use in components
-export type PrismaUser = {
+export type PrismaEvent = {
   id: string;
+  title: string;
+  startsAt: Date;
+  endsAt: Date;
+  createdBy: string;
+  wizardStage: number;
+  settings: any; // JSON type
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PrismaRoom = {
+  id: string;
+  eventId: string;
+  name: string;
+  capacity: number;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PrismaTimeBlock = {
+  id: string;
+  eventId: string;
+  startsAt: Date;
+  endsAt: Date;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PrismaTopic = {
+  id: string;
+  eventId: string;
+  title: string;
+  createdBy: string;
+  isLocked: boolean;
+  deletedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PrismaAttendee = {
+  id: string;
+  eventId: string;
+  name: string;
   email: string | null;
-  name: string | null;
+  lastSeenAt: Date | null;
+  interests: string[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PrismaVote = {
+  id: string;
+  topicId: string;
+  attendeeId: string;
+  createdAt: Date;
+};
+
+export type PrismaSession = {
+  id: string;
+  topicId: string;
+  roomId: string;
+  startsAt: Date;
+  endsAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type PrismaNote = {
+  id: string;
+  sessionId: string;
+  authorId: string | null;
+  content: string;
   createdAt: Date;
   updatedAt: Date;
 };

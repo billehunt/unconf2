@@ -20,13 +20,142 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Example model - will be expanded in the next task
-model User {
-  id String @id @default(cuid())
-  email String? @unique
-  name String?
+// Event model - core entity for unconference events
+model Event {
+  id String @id @default(uuid())
+  title String
+  startsAt DateTime
+  endsAt DateTime
+  createdBy String
+  wizardStage Int @default(0)
+  settings Json @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("users")
+  // Relations
+  rooms Room[]
+  timeBlocks TimeBlock[]
+  topics Topic[]
+  attendees Attendee[]
+
+  @@map("events")
+}
+
+// Room model - physical spaces for sessions
+model Room {
+  id String @id @default(uuid())
+  eventId String
+  name String
+  capacity Int
+  sortOrder Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sessions Session[]
+
+  @@map("rooms")
+}
+
+// TimeBlock model - time slots for sessions
+model TimeBlock {
+  id String @id @default(uuid())
+  eventId String
+  startsAt DateTime
+  endsAt DateTime
+  sortOrder Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("time_blocks")
+}
+
+// Topic model - session proposals and ideas
+model Topic {
+  id String @id @default(uuid())
+  eventId String
+  title String
+  createdBy String
+  isLocked Boolean @default(false)
+  deletedAt DateTime? // Soft delete
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  votes Vote[]
+  session Session?
+
+  @@map("topics")
+}
+
+// Attendee model - event participants
+model Attendee {
+  id String @id @default(uuid())
+  eventId String
+  name String
+  email String?
+  lastSeenAt DateTime?
+  interests String[] // TEXT[] array
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  votes Vote[]
+
+  @@map("attendees")
+}
+
+// Vote model - attendee votes on topics
+model Vote {
+  id String @id @default(uuid())
+  topicId String
+  attendeeId String
+  createdAt DateTime @default(now())
+
+  // Relations
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  attendee Attendee @relation(fields: [attendeeId], references: [id], onDelete: Cascade)
+
+  // Constraint: one vote per attendee per topic
+  @@unique([topicId, attendeeId])
+  @@map("votes")
+}
+
+// Session model - scheduled sessions
+model Session {
+  id String @id @default(uuid())
+  topicId String @unique
+  roomId String
+  startsAt DateTime
+  endsAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  notes Note[]
+
+  @@map("sessions")
+}
+
+// Note model - collaborative session notes
+model Note {
+  id String @id @default(uuid())
+  sessionId String
+  authorId String? // Nullable for anonymous notes
+  content String // Markdown content
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("notes")
 }
