@@ -71,7 +71,3 @@ export const STORAGE_KEYS = {
   ANONYMOUS_USER: 'unconf2_anonymous_user',
   ATTENDEE_DATA: 'unconf2_attendee_data',
 } as const; 
-// Admin authentication constants and functions
-export const ADMIN_PASSWORD = '1106';
-export const ADMIN_STORAGE_KEY = 'unconf2-admin-session';
-export const validateAdminPassword = (password: string): boolean => password === ADMIN_PASSWORD;
