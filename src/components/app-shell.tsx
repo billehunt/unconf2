@@ -28,25 +28,25 @@ export function AppShell({ children, className }: AppShellProps) {
               </div>
             </div>
 
-            {/* Navigation placeholder */}
+            {/* Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
               <a 
-                href="#" 
+                href="/" 
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                Events
+                Home
               </a>
               <a 
-                href="#" 
+                href="/setup" 
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                Create
+                Setup
               </a>
               <a 
-                href="#" 
+                href="/showcase" 
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                Help
+                Demo
               </a>
             </nav>
 
