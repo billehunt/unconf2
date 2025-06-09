@@ -1,4 +1,5 @@
 import { SupabaseConnectionTest } from '@/components/SupabaseConnectionTest';
+import { PrismaConnectionTest } from '@/components/PrismaConnectionTest';
 import { Database, Settings, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -33,6 +34,7 @@ export default function SetupPage() {
               </p>
               <ul className="text-xs space-y-1">
                 <li>✅ Connection setup</li>
+                <li>✅ Prisma client generated</li>
                 <li>🔄 Schema definition (next)</li>
                 <li>🔄 Migrations (next)</li>
               </ul>
@@ -83,6 +85,9 @@ export default function SetupPage() {
         {/* Supabase Connection Test */}
         <SupabaseConnectionTest />
 
+        {/* Prisma Database Connection Test */}
+        <PrismaConnectionTest />
+
         {/* Next Steps */}
         <Card>
           <CardHeader>
@@ -93,10 +98,10 @@ export default function SetupPage() {
               <h4 className="text-sm font-medium">After Supabase Setup:</h4>
               <ol className="text-sm text-muted-foreground space-y-1 ml-4">
                 <li>1. ✅ Install and configure Prisma</li>
-                <li>2. ✅ Define database schema models</li>
-                <li>3. ✅ Set up automated migrations</li>
-                <li>4. ✅ Create seed data for development</li>
-                <li>5. ✅ Implement authentication wrapper</li>
+                <li>2. 🔄 Define database schema models (next)</li>
+                <li>3. 🔄 Set up automated migrations</li>
+                <li>4. 🔄 Create seed data for development</li>
+                <li>5. 🔄 Implement authentication wrapper</li>
               </ol>
             </div>
 

@@ -58,8 +58,11 @@ Once your project is ready:
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
    SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 
-   # Optional: Database password for direct connections
-   SUPABASE_DB_PASSWORD=your-database-password
+   # Database Connection (Prisma)
+   # Replace 'your-project-ref' with your actual Supabase project reference
+   # Replace 'your-db-password' with your actual database password
+   DATABASE_URL="postgresql://postgres:[your-db-password]@db.[your-project-ref].supabase.co:5432/postgres?connection_limit=1&pool_timeout=10"
+   DIRECT_URL="postgresql://postgres:[your-db-password]@db.[your-project-ref].supabase.co:5432/postgres"
 
    # Development settings
    NODE_ENV=development
@@ -87,7 +90,30 @@ Row Level Security is crucial for protecting your data:
    - We'll set up specific RLS policies when we create our database schema
    - For now, just ensure RLS is enabled globally
 
-## Step 5: Test Your Connection
+## Step 5: Configure Database Connection (Prisma)
+
+1. **Get Database Connection Details**
+   - In your Supabase dashboard: `Settings` → `Database`
+   - Look for "Connection string" section
+   - Note down your database password (the one you set when creating the project)
+
+2. **Construct Connection URLs**
+   - Your project reference is the part before `.supabase.co` in your Project URL
+   - Replace `[your-project-ref]` and `[your-db-password]` in the template
+   - Example: If your URL is `https://abc123.supabase.co`, your project ref is `abc123`
+
+3. **Add Database URLs to Environment**
+   ```env
+   DATABASE_URL="postgresql://postgres:your-actual-password@db.your-project-ref.supabase.co:5432/postgres?connection_limit=1&pool_timeout=10"
+   DIRECT_URL="postgresql://postgres:your-actual-password@db.your-project-ref.supabase.co:5432/postgres"
+   ```
+
+4. **Generate Prisma Client**
+   ```bash
+   npm run db:generate
+   ```
+
+## Step 6: Test Your Connection
 
 1. **Start Your Development Server**
 
