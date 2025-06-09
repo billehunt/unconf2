@@ -1,19 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Vote, Lightbulb, FileText, ArrowRight, Sparkles, Shield, LogIn, LogOut } from 'lucide-react';
+import { Calendar, Vote, Lightbulb, FileText, ArrowRight, Sparkles, Shield, LogOut } from 'lucide-react';
 import { AuthDebug } from '@/components/auth-debug';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { validateAdminPassword, ADMIN_STORAGE_KEY } from '@/lib/auth';
+import { AdminAuthModal } from '@/components/admin-auth-modal';
+import { ADMIN_STORAGE_KEY } from '@/lib/auth';
 import Link from 'next/link';
 
 export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
-  const [adminError, setAdminError] = useState('');
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -35,25 +32,9 @@ export default function Home() {
     }
   }, []);
 
-  const handleAdminLogin = () => {
-    setAdminError('');
-    
-    if (validateAdminPassword(adminPassword)) {
-      const adminSession = {
-        isAdmin: true,
-        timestamp: Date.now(),
-      };
-      
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminSession));
-      }
-      
-      setIsAdmin(true);
-      setShowAdminLogin(false);
-      setAdminPassword('');
-    } else {
-      setAdminError('Invalid admin password');
-    }
+  const handleAdminSuccess = () => {
+    setShowAdminAuth(false);
+    setIsAdmin(true);
   };
 
   const handleAdminLogout = () => {
@@ -93,61 +74,13 @@ export default function Home() {
       )}
 
       {/* Admin Login Modal */}
-      {showAdminLogin && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-md w-full">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                      Admin Login
-                    </h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Sign in to manage events
-                    </p>
-                  </div>
-                </div>
-                <Button onClick={() => setShowAdminLogin(false)} variant="ghost" size="sm">
-                  ×
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <Input
-                    type="password"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder="Enter admin password"
-                    className={adminError ? 'border-red-500' : ''}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAdminLogin()}
-                  />
-                  {adminError && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {adminError}
-                    </p>
-                  )}
-                </div>
-
-                <Button onClick={handleAdminLogin} disabled={!adminPassword} className="w-full">
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Sign In as Admin
-                </Button>
-              </div>
-
-              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                <p className="text-xs text-blue-800 dark:text-blue-200">
-                  <strong>Default password:</strong> 1106
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <AdminAuthModal
+        isOpen={showAdminAuth}
+        onClose={() => setShowAdminAuth(false)}
+        onSuccess={handleAdminSuccess}
+        title="Admin Login"
+        description="Sign in to manage events and access admin features"
+      />
 
       {/* Auth Demo Section - Collapsed by default */}
       <div className="mb-12">
@@ -189,7 +122,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
             {mounted && !isAdmin ? (
               <button
-                onClick={() => setShowAdminLogin(true)}
+                onClick={() => setShowAdminAuth(true)}
                 className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl"
               >
                 <Shield className="h-5 w-5" />
@@ -353,7 +286,7 @@ export default function Home() {
                 </Link>
               ) : (
                 <button 
-                  onClick={() => setShowAdminLogin(true)}
+                  onClick={() => setShowAdminAuth(true)}
                   className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   Get Started Today

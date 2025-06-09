@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { logger } from '@/lib/logger';
+import { AdminAuthModal } from '@/components/admin-auth-modal';
+import { ADMIN_STORAGE_KEY } from '@/lib/auth';
 
 interface DeleteEventButtonProps {
   eventId: string;
@@ -21,14 +23,49 @@ export function DeleteEventButton({
 }: DeleteEventButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
-  const handleDelete = async () => {
-    if (!showConfirm) {
-      setShowConfirm(true);
+  useEffect(() => {
+    setMounted(true);
+    checkAdminStatus();
+  }, []);
+
+  const checkAdminStatus = () => {
+    if (typeof window !== 'undefined') {
+      const adminSession = localStorage.getItem(ADMIN_STORAGE_KEY);
+      if (adminSession) {
+        try {
+          const session = JSON.parse(adminSession);
+          if (session.isAdmin && session.timestamp && Date.now() - session.timestamp < 24 * 60 * 60 * 1000) {
+            setIsAdmin(true);
+          } else {
+            localStorage.removeItem(ADMIN_STORAGE_KEY);
+          }
+        } catch {
+          localStorage.removeItem(ADMIN_STORAGE_KEY);
+        }
+      }
+    }
+  };
+
+  const handleDeleteClick = () => {
+    if (!isAdmin) {
+      setShowAdminAuth(true);
       return;
     }
+    setShowConfirm(true);
+  };
 
+  const handleAdminSuccess = () => {
+    setShowAdminAuth(false);
+    setIsAdmin(true);
+    setShowConfirm(true);
+  };
+
+  const handleDelete = async () => {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/events?eventId=${eventId}`, {
@@ -62,17 +99,35 @@ export function DeleteEventButton({
 
   const hasActivity = attendeeCount > 0 || topicCount > 0;
 
-  if (!showConfirm) {
+  if (!mounted) {
     return (
-      <Button
-        variant="destructive"
-        onClick={handleDelete}
-        disabled={isDeleting}
-        className="flex items-center gap-2"
-      >
+      <Button variant="destructive" disabled className="flex items-center gap-2">
         <Trash2 className="w-4 h-4" />
         Delete Event
       </Button>
+    );
+  }
+
+  if (!showConfirm) {
+    return (
+      <>
+        <AdminAuthModal
+          isOpen={showAdminAuth}
+          onClose={() => setShowAdminAuth(false)}
+          onSuccess={handleAdminSuccess}
+          title="Delete Event"
+          description="Deleting an event requires administrator privileges"
+        />
+        <Button
+          variant="destructive"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          className="flex items-center gap-2"
+        >
+          <Trash2 className="w-4 h-4" />
+          Delete Event
+        </Button>
+      </>
     );
   }
 
