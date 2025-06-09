@@ -61,6 +61,8 @@ alwaysApply: true
 
 ### IMPORTANT:
 
-- At the end of every agent interaction, always append to `.cursor-updates` file in markdown format: a H1 one-sentence summary of changes you made, and a concise note to yourself of what you would do differently if you performed this task again
+- At the end of every agent interaction, always append to `.cursor-updates` file in markdown format:
+   - a H1 one-sentence summary of changes you made
+   - a concise note to yourself of what you would do differently if you performed this task again
 - If you forget, the user can type the command "finish" and you will run the build and update `.cursor-updates`.
 - Finally, update git with `git add . && git commit -m "..."`. Don't push.
