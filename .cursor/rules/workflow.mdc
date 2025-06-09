@@ -18,7 +18,7 @@ It must **never** pause after individual tasks or subtasks.
 
 2. Append to `.cursor-updates`:  in markdown format:
    - a H1 one-sentence summary of changes you made
-   - a concise note to yourself of what you would do differently if you performed this task again
+   - a concise note to yourself of what you would do differently if you performed this task again. This should be in a format that could be added to your rules, for future projects.
 
 3. Update the `.tasks.md` file checking off the task that's been completed.
 
