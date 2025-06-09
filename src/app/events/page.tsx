@@ -209,14 +209,14 @@ export default async function EventsPage() {
 
                         {/* Actions */}
                         <div className="flex gap-2 pt-2">
-                          <Link href={`/e/${event.id}`} className="flex-1">
+                          <Link href={`/e/${friendlySlug || event.id}`} className="flex-1">
                             <Button variant="outline" className="w-full flex items-center gap-2">
                               <ExternalLink className="w-4 h-4" />
                               View Event
                             </Button>
                           </Link>
                           {status.label !== 'Completed' && (
-                            <Link href={`/e/${event.id}`} className="flex-1">
+                            <Link href={`/e/${friendlySlug || event.id}`} className="flex-1">
                               <Button className="w-full">
                                 Join Event
                               </Button>

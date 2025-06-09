@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
         title: event.title,
         startsAt: event.startsAt,
         endsAt: event.endsAt,
-        accessUrl: `/e/${event.id}`, // Use ID for now until we can migrate the schema
-        qrUrl: `/e/${event.id}`,
+        accessUrl: `/e/${friendlySlug}`, // Use friendly slug in URLs now
+        qrUrl: `/e/${friendlySlug}`,
       },
     });
     

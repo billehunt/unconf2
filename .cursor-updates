@@ -114,3 +114,9 @@ Successfully fixed the fake QR code generator by implementing the real `qrcode` 
 
 **Rule for future projects:** Always use established libraries (like `qrcode`) for standard functionality rather than implementing custom algorithms. When dealing with database schema changes that require environment setup, implement temporary workarounds (like storing data in JSON fields) to maintain development momentum while planning proper migrations. Create comprehensive listing pages early to help users discover and navigate content - they provide immediate value and help test the data model.
 
+# Implemented Memorable URLs, Event QR Codes & Edit Interface
+
+Successfully implemented memorable URL routing using friendly slugs like "tech-summit" and "brilliant-workshop" stored in event settings. Events now accessible via `/e/outstanding-hackathon` instead of long UUIDs. Updated API to return friendly slug URLs and QR codes. Added QR code display to event pages with sharing interface showing full URLs and instructions. Created event edit page at `/organiser/edit/[eventId]` with overview of event details, rooms, time blocks, and attendee/topic counts. Updated all internal links to use friendly slugs while maintaining UUID fallback compatibility. Build passes successfully with proper routing.
+
+**Rule for future projects:** When implementing URL routing with memorable slugs, always maintain backwards compatibility with existing ID-based URLs during transition periods. Store friendly slugs in temporary locations (like JSON settings) when database schema changes are blocked by environment issues. Implement QR codes and sharing interfaces on content pages to improve discovery and user engagement. Create edit interfaces early even if they're placeholder pages - they help establish the information architecture and user workflows.
+
