@@ -1,14 +1,14 @@
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-secondary-50 to-primary-50">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/50 to-primary/5">
       {/* Hero Section */}
-      <div className="container-responsive py-24">
+      <div className="py-16">
         <div className="text-center space-y-8">
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
               <span className="gradient-primary text-gradient">Unconf2</span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto text-balance">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto text-balance">
               The modern way to organize and manage unconference events. Empower
               your community with AI-powered scheduling and real-time
               collaboration.
@@ -27,12 +27,12 @@ export default function Home() {
       </div>
 
       {/* Features Grid */}
-      <div className="container-responsive py-16">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+      <div className="py-12">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
             Everything you need for successful unconferences
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
             From idea submission to final notes, streamline your entire event
             workflow.
           </p>
@@ -40,11 +40,11 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Event Management Card */}
-          <div className="card group hover:shadow-glow transition-all duration-300 animate-fade-in">
+          <div className="card group hover:shadow-glow transition-all duration-300">
             <div className="card-header">
-              <div className="w-12 h-12 rounded-xl bg-primary-100 dark:bg-primary-900 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <svg
-                  className="w-6 h-6 text-primary-600"
+                  className="w-5 h-5 text-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -57,12 +57,12 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-foreground">
                 Event Setup
               </h3>
             </div>
             <div className="card-content">
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Create events with custom rooms, time blocks, and attendee
                 management in minutes.
               </p>
@@ -70,14 +70,11 @@ export default function Home() {
           </div>
 
           {/* Voting Card */}
-          <div
-            className="card group hover:shadow-glow transition-all duration-300 animate-fade-in"
-            style={{ animationDelay: '0.1s' }}
-          >
+          <div className="card group hover:shadow-glow transition-all duration-300">
             <div className="card-header">
-              <div className="w-12 h-12 rounded-xl bg-accent-100 dark:bg-accent-900 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <svg
-                  className="w-6 h-6 text-accent-600"
+                  className="w-5 h-5 text-accent-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -90,12 +87,12 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-foreground">
                 Real-time Voting
               </h3>
             </div>
             <div className="card-content">
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Let attendees vote on topics with live updates and democratic
                 session selection.
               </p>
@@ -103,14 +100,11 @@ export default function Home() {
           </div>
 
           {/* AI Scheduling Card */}
-          <div
-            className="card group hover:shadow-glow-accent transition-all duration-300 animate-fade-in"
-            style={{ animationDelay: '0.2s' }}
-          >
+          <div className="card group hover:shadow-glow-accent transition-all duration-300">
             <div className="card-header">
-              <div className="w-12 h-12 rounded-xl bg-success-100 dark:bg-success-900 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <svg
-                  className="w-6 h-6 text-success-600"
+                  className="w-5 h-5 text-green-600 dark:text-green-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -123,12 +117,12 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-foreground">
                 AI Scheduling
               </h3>
             </div>
             <div className="card-content">
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Smart algorithm optimally assigns sessions to rooms and time
                 slots automatically.
               </p>
@@ -136,14 +130,11 @@ export default function Home() {
           </div>
 
           {/* Collaboration Card */}
-          <div
-            className="card group hover:shadow-glow transition-all duration-300 animate-fade-in"
-            style={{ animationDelay: '0.3s' }}
-          >
+          <div className="card group hover:shadow-glow transition-all duration-300">
             <div className="card-header">
-              <div className="w-12 h-12 rounded-xl bg-warning-100 dark:bg-warning-900 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <svg
-                  className="w-6 h-6 text-warning-600"
+                  className="w-5 h-5 text-orange-600 dark:text-orange-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -156,12 +147,12 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-foreground">
                 Live Notes
               </h3>
             </div>
             <div className="card-content">
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Collaborative note-taking with Markdown support and real-time
                 synchronization.
               </p>
@@ -170,51 +161,53 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Typography Showcase */}
-      <div className="container-responsive py-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="prose prose-lg dark:prose-dark mx-auto">
-            <h2>Why Choose Unconf2?</h2>
-            <p className="text-balance">
-              Traditional conference management tools are rigid and outdated.
-              Unconf2 brings the flexibility and innovation that unconferences
-              deserve.
-            </p>
-            <ul>
-              <li>
-                <strong>Real-time collaboration</strong> keeps everyone engaged
-              </li>
-              <li>
-                <strong>AI-powered features</strong> reduce organizer workload
-              </li>
-              <li>
-                <strong>Mobile-first design</strong> works on any device
-              </li>
-              <li>
-                <strong>Open source transparency</strong> you can trust
-              </li>
-            </ul>
-          </div>
+      {/* Development Pages Navigation */}
+      <div className="py-8 border-t">
+        <div className="text-center mb-6">
+          <h3 className="text-lg font-semibold text-foreground mb-2">Development Pages</h3>
+          <p className="text-sm text-muted-foreground">Quick access to setup and testing pages</p>
+        </div>
+        <div className="flex flex-wrap justify-center gap-4">
+          <a 
+            href="/setup" 
+            className="btn btn-outline text-sm px-4 py-2 h-9 hover:bg-accent"
+          >
+            📋 Setup & Testing
+          </a>
+          <a 
+            href="/showcase" 
+            className="btn btn-outline text-sm px-4 py-2 h-9 hover:bg-accent"
+          >
+            🎨 Component Showcase
+          </a>
+          <a 
+            href="/api/test-prisma" 
+            className="btn btn-outline text-sm px-4 py-2 h-9 hover:bg-accent"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            🔌 Database Test
+          </a>
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="container-responsive py-24">
-        <div className="card max-w-4xl mx-auto text-center gradient-primary shadow-glow">
-          <div className="card-content py-16 px-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+      <div className="py-16">
+        <div className="card max-w-3xl mx-auto text-center gradient-primary shadow-glow">
+          <div className="card-content py-12 px-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
               Ready to transform your events?
             </h2>
-            <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-primary-100 mb-6 max-w-xl mx-auto">
               Join the growing community of organizers who trust Unconf2 for
               their unconference events.
             </p>
-            <button className="btn bg-white text-primary-600 hover:bg-primary-50 px-8 py-3 text-lg h-12 font-semibold">
+            <button className="btn bg-white text-primary-600 hover:bg-primary-50 px-6 py-2 text-base h-10 font-semibold">
               Get Started Today
             </button>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
