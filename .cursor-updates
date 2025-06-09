@@ -34,3 +34,13 @@ Successfully defined all core database models for the unconference platform: Eve
 
 **Rule for future projects:** When designing complex relational schemas, define all models together in a single session to ensure proper relationship mapping and avoid circular dependency issues. Always create the seed script immediately after the schema to validate the relationships work correctly before proceeding to application logic.
 
+# Data Modeling Phase Complete - Critical Prisma & Environment Learnings
+
+Completed all 9 data modeling tasks including Event, Room, TimeBlock, Topic, Attendee, Vote, Session, and Note models with full relational constraints. Successfully migrated from placeholder User model to complete unconference schema. Created seed script with realistic demo data and verified database connectivity. Build passes and all changes committed.
+
+**Critical Environment Variable Learning:** Prisma Studio requires explicit environment loading via `npm run db:studio` (which uses `dotenv -e .env.local`) rather than direct `npx prisma studio` commands. The latter only loads `.env` files, missing critical Supabase credentials in `.env.local`. This caused "fetch failed" errors in Studio UI until proper environment loading was used.
+
+**Migration Workflow Insight:** When replacing existing models entirely, create new migration with `npm run db:migrate -- --name "descriptive-name"` rather than attempting to modify existing migrations. Prisma correctly handles dropping old tables and creating new ones with proper foreign key constraints.
+
+**Rule for future projects:** Always use project-specific npm scripts for Prisma commands (db:studio, db:migrate, db:seed) rather than direct npx commands, as they ensure proper environment variable loading. Set up database testing early with both Prisma Studio and API endpoints to validate connectivity from multiple angles. Document environment setup clearly to avoid credential overwrites during template copying.
+
