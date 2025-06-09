@@ -96,3 +96,9 @@ Successfully created comprehensive organiser wizard infrastructure with Step 1 E
 
 **Rule for future projects:** Implement form auto-saving with proper debouncing from the start to prevent data loss during wizard flows. Use Zod schemas for comprehensive validation including cross-field validation (e.g., end time after start time). Create placeholder components for incomplete wizard steps to maintain build compatibility while developing incrementally. Always validate both individual fields and relationships between fields in multi-step forms.
 
+# Implemented Organiser Wizard Step 2 - Rooms Management with Drag & Drop
+
+Successfully created complete Rooms step with advanced UX features. Installed @dnd-kit packages for accessible drag-and-drop functionality. Built dynamic room list with add/remove capabilities (1-10 rooms), form validation using Zod schema (name 1-50 chars, capacity 1-1000), drag-to-reorder with visual feedback and accessibility support, auto-saving with 500ms debounce, and room suggestions for common unconference setups. Features sortable cards with grip handles, individual room validation, proper TypeScript types, and seamless integration with wizard persistence. Build passes successfully with 46.8 kB bundle size including full drag-and-drop library.
+
+**Rule for future projects:** Choose @dnd-kit over react-beautiful-dnd for new projects as it provides better accessibility, touch support, and TypeScript integration. Implement proper filter logic in auto-save to avoid saving incomplete/invalid data while maintaining user experience. When building drag-and-drop interfaces, always include visual feedback (opacity, shadows) and proper accessibility attributes for screen readers and keyboard navigation.
+
