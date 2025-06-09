@@ -224,7 +224,10 @@ export function EventDetailsStep({ data, onDataChange, onNext, isLoading }: Even
         {process.env.NODE_ENV === 'development' && (
           <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs">
             <div>Form valid: {isValid ? 'Yes' : 'No'}</div>
-            <div>Errors: {Object.keys(errors).length > 0 ? JSON.stringify(errors, null, 2) : 'None'}</div>
+            <div>Errors: {Object.keys(errors).length > 0 ? 
+              Object.entries(errors).map(([field, error]) => 
+                `${field}: ${error?.message || 'Invalid'}`
+              ).join(', ') : 'None'}</div>
           </div>
         )}
       </form>
