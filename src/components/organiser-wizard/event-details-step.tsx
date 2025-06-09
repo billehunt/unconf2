@@ -61,10 +61,17 @@ export function EventDetailsStep({ data, onDataChange, onNext, isLoading }: Even
     mode: 'onChange', // Validate on change for immediate feedback
   });
 
-  const { register, handleSubmit, formState: { errors, isValid }, watch } = form;
+  const { register, handleSubmit, formState: { errors, isValid }, watch, trigger } = form;
 
   // Watch all form values for auto-saving
   const watchedValues = watch();
+
+  // Trigger validation on mount to make the form valid with default values
+  useEffect(() => {
+    if (data.date && data.startTime && data.endTime) {
+      trigger(); // Trigger validation for all fields
+    }
+  }, [data, trigger]);
 
   // Auto-save form data when values change (optimistic draft save)
   useEffect(() => {
@@ -89,8 +96,6 @@ export function EventDetailsStep({ data, onDataChange, onNext, isLoading }: Even
     onDataChange(formData);
     onNext();
   };
-
-
 
   return (
     <div className="space-y-6">
@@ -142,6 +147,9 @@ export function EventDetailsStep({ data, onDataChange, onNext, isLoading }: Even
           {errors.date && (
             <p className="text-sm text-red-600 dark:text-red-400">{errors.date.message}</p>
           )}
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Defaults to tomorrow - you can change this to any future date.
+          </p>
         </div>
 
         {/* Time Range */}
@@ -189,7 +197,7 @@ export function EventDetailsStep({ data, onDataChange, onNext, isLoading }: Even
           <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
             <div>• Half-day morning: 9:00 AM - 1:00 PM</div>
             <div>• Half-day afternoon: 1:00 PM - 6:00 PM</div>
-            <div>• Full day: 9:00 AM - 5:00 PM</div>
+            <div>• Full day: 9:00 AM - 5:00 PM (default)</div>
             <div>• Evening session: 6:00 PM - 9:00 PM</div>
           </div>
         </div>
@@ -211,6 +219,14 @@ export function EventDetailsStep({ data, onDataChange, onNext, isLoading }: Even
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
+
+        {/* Debug info for development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs">
+            <div>Form valid: {isValid ? 'Yes' : 'No'}</div>
+            <div>Errors: {Object.keys(errors).length > 0 ? JSON.stringify(errors, null, 2) : 'None'}</div>
+          </div>
+        )}
       </form>
     </div>
   );

@@ -25,13 +25,21 @@ export interface WizardData {
   }>;
 }
 
-const INITIAL_WIZARD_DATA: WizardData = {
-  eventDetails: {
+// Generate default event details with tomorrow's date and sensible times
+const getDefaultEventDetails = () => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  return {
     title: '',
-    date: '',
-    startTime: '',
-    endTime: '',
-  },
+    date: tomorrow.toISOString().split('T')[0] || '', // Format as YYYY-MM-DD, fallback to empty string
+    startTime: '09:00',
+    endTime: '17:00',
+  };
+};
+
+const INITIAL_WIZARD_DATA: WizardData = {
+  eventDetails: getDefaultEventDetails(),
   rooms: [],
   timeBlocks: [],
 };
@@ -47,7 +55,17 @@ export function OrganiserWizard() {
       const saved = localStorage.getItem('organiser-wizard-draft');
       if (saved) {
         const parsedData = JSON.parse(saved);
-        setWizardData(parsedData.wizardData || INITIAL_WIZARD_DATA);
+        // Merge saved data with defaults to ensure all fields have values
+        const savedWizardData = parsedData.wizardData || {};
+        const mergedData: WizardData = {
+          eventDetails: {
+            ...getDefaultEventDetails(),
+            ...savedWizardData.eventDetails,
+          },
+          rooms: savedWizardData.rooms || [],
+          timeBlocks: savedWizardData.timeBlocks || [],
+        };
+        setWizardData(mergedData);
         setCurrentStep(parsedData.currentStep || 1);
         logger.info('Loaded wizard draft from localStorage', {
           component: 'organiser-wizard',

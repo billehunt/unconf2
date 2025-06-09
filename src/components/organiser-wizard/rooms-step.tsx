@@ -67,16 +67,18 @@ interface SortableRoomItemProps {
 }
 
 function SortableRoomItem({ index, register, errors, onRemove, canRemove, isDragEnabled = true }: SortableRoomItemProps) {
-  const sortable = isDragEnabled ? useSortable({ id: `room-${index}` }) : null;
-  
+  // Always call the hook, but conditionally use its functionality
   const {
-    attributes = {},
-    listeners = {},
-    setNodeRef = () => {},
-    transform = null,
-    transition = '',
-    isDragging = false,
-  } = sortable || {};
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ 
+    id: `room-${index}`,
+    disabled: !isDragEnabled,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
