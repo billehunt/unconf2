@@ -1,5 +1,6 @@
 import { SupabaseConnectionTest } from '@/components/SupabaseConnectionTest';
 import { PrismaConnectionTest } from '@/components/PrismaConnectionTest';
+import { ErrorDemo } from '@/components/error-demo';
 import { Database, Settings, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -87,6 +88,9 @@ export default function SetupPage() {
 
         {/* Prisma Database Connection Test */}
         <PrismaConnectionTest />
+
+        {/* Error Handling & Logging Demo */}
+        <ErrorDemo />
 
         {/* Next Steps */}
         <Card>

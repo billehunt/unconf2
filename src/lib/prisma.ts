@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 // PrismaClient is attached to the `global` object in development to prevent
 // exhausting your database connection limit during development.
@@ -43,19 +44,25 @@ export const testPrismaConnection = async () => {
   }
 
   try {
-    console.log('Testing Prisma connection...');
-    console.log('DATABASE_URL present:', !!databaseUrl);
-    console.log('DIRECT_URL present:', !!directUrl);
+    logger.info('Testing Prisma connection', {
+      databaseUrlPresent: !!databaseUrl,
+      directUrlPresent: !!directUrl,
+      component: 'prisma',
+    });
     
     await prisma.$connect();
-    console.log('Prisma connected successfully');
+    logger.info('Prisma connected successfully', { component: 'prisma' });
 
     // Test with a simple query
+    const start = Date.now();
     const result = await prisma.$queryRaw`SELECT 1 as test`;
-    console.log('Query result:', result);
+    const duration = Date.now() - start;
+    
+    logger.query('SELECT 1 as test', [], duration);
+    logger.debug('Query result', { result, component: 'prisma' });
 
     await prisma.$disconnect();
-    console.log('Prisma disconnected successfully');
+    logger.info('Prisma disconnected successfully', { component: 'prisma' });
 
     return {
       success: true,
@@ -63,9 +70,15 @@ export const testPrismaConnection = async () => {
       details: `Database query returned: ${JSON.stringify(result)}`,
     };
   } catch (error) {
-    console.error('Prisma connection error:', error);
+    const errorInstance = error instanceof Error ? error : new Error(String(error));
     
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Prisma connection error', errorInstance, {
+      component: 'prisma',
+      databaseUrlPresent: !!databaseUrl,
+      directUrlPresent: !!directUrl,
+    });
+    
+    const errorMessage = errorInstance.message;
     
     // Check for common connection issues and provide helpful messages
     if (errorMessage.includes('ENOTFOUND')) {

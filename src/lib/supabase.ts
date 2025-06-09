@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 // Get environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -63,7 +64,12 @@ export interface ConnectionTestResult {
 
 // Helper function to handle Supabase errors
 export const handleSupabaseError = (error: unknown) => {
-  console.error('Supabase error:', error);
+  const errorInstance = error instanceof Error ? error : new Error(String(error));
+  
+  logger.error('Supabase error', errorInstance, {
+    component: 'supabase',
+    errorType: typeof error,
+  });
 
   if (error && typeof error === 'object' && 'message' in error) {
     return (error as { message: string }).message;
