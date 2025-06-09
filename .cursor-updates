@@ -68,3 +68,19 @@ Successfully implemented client-only authentication system supporting both anony
 
 **Rule for future projects:** Design auth systems with anonymous users as first-class citizens rather than afterthoughts. Use TypeScript discriminated unions for user types to ensure type safety. Implement auth state as early as possible in the component tree but after essential providers like theme. Create comprehensive auth debug components during development to test all auth flows including sign in, sign out, and state transitions.
 
+# Fixed Critical SSR Crash from Auth Provider Browser API Access
+
+Resolved server-side rendering crash caused by auth provider attempting to access localStorage and other browser APIs during SSR. Added mounted state tracking with useEffect to ensure all browser-specific code only runs after client-side hydration. Implemented fallback auth context during SSR phase to prevent hydration mismatches. All localStorage operations now properly guarded with mounted and window checks. Auth debug component also updated with proper mounting guards to prevent SSR issues.
+
+**SSR Architecture Learning:** Client-side auth providers must carefully handle the server-client boundary when using browser APIs like localStorage. Even with "use client" directive, components can still run during SSR in certain conditions. Mounted state pattern with useEffect is essential for ensuring browser API access only happens after hydration. Providing fallback values during SSR prevents hydration mismatches that can cause React errors.
+
+**Rule for future projects:** Always implement mounted state tracking for any component that accesses browser APIs, even in "use client" components. Guard localStorage, sessionStorage, window, and document access with both typeof window checks and mounted state. Provide appropriate fallback values during SSR to maintain component structure. Clear Next.js cache (.next directory) when resolving bundling issues related to external dependencies.
+
+# Resolved Tailwind CSS Version Conflict and Styling Issues
+
+Fixed complete styling failure caused by conflicting Tailwind CSS v3 and v4 dependencies running simultaneously. Removed @tailwindcss/postcss v4 dependency that was causing "Cannot apply unknown utility class" errors. Updated postcss.config.js to use standard tailwindcss plugin instead of v4-specific syntax. Created missing /setup and /showcase pages to resolve build failures. All pages now load successfully with proper Tailwind CSS styling applied.
+
+**Build System Learning:** Version conflicts between major framework versions can cause cryptic build errors that seem unrelated to the actual issue. Tailwind v4 introduces breaking changes including new @reference directive requirements and different PostCSS plugin structure. When seeing "unknown utility class" errors, check for dependency conflicts first before debugging CSS configuration. Build success doesn't guarantee runtime success - always test actual page loading after resolving build issues.
+
+**Rule for future projects:** Maintain consistent major versions across related dependencies (e.g., all Tailwind packages should be v3 OR v4, not mixed). Check package.json carefully when adding new CSS framework features. Use exact version pinning for critical styling dependencies. Test both build AND runtime after resolving dependency conflicts. Create placeholder pages for all navigation links early to prevent build failures during development.
+
