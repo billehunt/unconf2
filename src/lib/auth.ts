@@ -71,7 +71,21 @@ export const STORAGE_KEYS = {
   ANONYMOUS_USER: 'unconf2_anonymous_user',
   ATTENDEE_DATA: 'unconf2_attendee_data',
 } as const; 
+
 // Admin authentication constants and functions
 export const ADMIN_PASSWORD = '1106';
 export const ADMIN_STORAGE_KEY = 'unconf2-admin-session';
 export const validateAdminPassword = (password: string): boolean => password === ADMIN_PASSWORD;
+
+// Server-side admin validation for API routes
+export const validateAdminSession = (request: Request): boolean => {
+  const adminHeader = request.headers.get('x-admin-session');
+  if (!adminHeader) return false;
+  
+  try {
+    const session = JSON.parse(adminHeader);
+    return session.isAdmin && session.timestamp && Date.now() - session.timestamp < 24 * 60 * 60 * 1000;
+  } catch {
+    return false;
+  }
+};

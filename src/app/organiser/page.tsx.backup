@@ -1,0 +1,235 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { OrganiserWizard } from '@/components/organiser-wizard';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { Shield, LogIn, X } from 'lucide-react';
+import { validateAdminPassword, ADMIN_STORAGE_KEY } from '@/lib/auth';
+import Link from 'next/link';
+
+export default function OrganiserPage() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== 'undefined') {
+      const adminSession = localStorage.getItem(ADMIN_STORAGE_KEY);
+      if (adminSession) {
+        try {
+          const session = JSON.parse(adminSession);
+          if (session.isAdmin && session.timestamp && Date.now() - session.timestamp < 24 * 60 * 60 * 1000) {
+            setIsAdmin(true);
+          } else {
+            localStorage.removeItem(ADMIN_STORAGE_KEY);
+          }
+        } catch {
+          localStorage.removeItem(ADMIN_STORAGE_KEY);
+        }
+      }
+    }
+  }, []);
+
+  const handleLogin = () => {
+    setIsSubmitting(true);
+    setError('');
+    
+    if (validateAdminPassword(password)) {
+      const adminSession = {
+        isAdmin: true,
+        timestamp: Date.now(),
+      };
+      
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminSession));
+      }
+      
+      setIsAdmin(true);
+      setIsModalOpen(false);
+      setPassword('');
+    } else {
+      setError('Invalid admin password');
+    }
+    setIsSubmitting(false);
+  };
+
+  const AdminModal = () => {
+    if (!isModalOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                    Admin Access Required
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Only admins can create events
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setPassword('');
+                  setError('');
+                }}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="adminPassword">Admin Password</Label>
+                <Input
+                  id="adminPassword"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter admin password"
+                  disabled={isSubmitting}
+                  className={error ? 'border-red-500' : ''}
+                  onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                />
+                {error && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {error}
+                  </p>
+                )}
+              </div>
+
+              <Button 
+                onClick={handleLogin}
+                disabled={isSubmitting || !password}
+                className="w-full flex items-center gap-2"
+              >
+                <LogIn className="w-4 h-4" />
+                {isSubmitting ? 'Signing in...' : 'Sign In as Admin'}
+              </Button>
+            </div>
+
+            <div className="mt-6 p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
+              <div className="flex items-start gap-2">
+                <Shield className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-yellow-900 dark:text-yellow-100 font-medium">
+                    Default password: &quot;1106&quot;
+                  </p>
+                  <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                    Admin access allows creating, editing, and deleting events.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  if (!mounted) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="flex items-center justify-center min-h-[200px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show admin login if not authenticated as admin
+  if (!isAdmin) {
+    return (
+      <>
+        <AdminModal />
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="mb-8">
+            <Link href="/" className="text-sm text-blue-600 hover:text-blue-800">
+              ← Back to Home
+            </Link>
+          </div>
+          
+          <Card className="max-w-2xl mx-auto">
+            <CardContent className="p-8 text-center space-y-6">
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto">
+                <Shield className="w-8 h-8 text-red-600 dark:text-red-400" />
+              </div>
+              
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                  Admin Access Required
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Only administrators can create and manage events. Please sign in with admin credentials to continue.
+                </p>
+              </div>
+
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <LogIn className="w-4 h-4" />
+                Sign In as Admin
+              </Button>
+
+              <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-4">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  <strong>Regular users</strong> can browse and join events from the{' '}
+                  <Link href="/events" className="underline hover:no-underline">
+                    events page
+                  </Link>
+                  . Event creation is restricted to administrators.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  // Show the organiser wizard if admin
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* Admin Status Banner */}
+      <div className="bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <span className="text-green-800 dark:text-green-200 font-medium">
+              Admin Mode Active - Creating new event
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          Create Your Unconference Event
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Set up your event in 3 simple steps. We&apos;ll save your progress automatically.
+        </p>
+      </div>
+      
+      <OrganiserWizard />
+    </div>
+  );
+} 

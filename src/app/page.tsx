@@ -1,9 +1,154 @@
-import { Calendar, Vote, Lightbulb, FileText, ArrowRight, Sparkles } from 'lucide-react';
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Calendar, Vote, Lightbulb, FileText, ArrowRight, Sparkles, Shield, LogIn, LogOut } from 'lucide-react';
 import { AuthDebug } from '@/components/auth-debug';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { validateAdminPassword, ADMIN_STORAGE_KEY } from '@/lib/auth';
+import Link from 'next/link';
 
 export default function Home() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminError, setAdminError] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== 'undefined') {
+      const adminSession = localStorage.getItem(ADMIN_STORAGE_KEY);
+      if (adminSession) {
+        try {
+          const session = JSON.parse(adminSession);
+          if (session.isAdmin && session.timestamp && Date.now() - session.timestamp < 24 * 60 * 60 * 1000) {
+            setIsAdmin(true);
+          } else {
+            localStorage.removeItem(ADMIN_STORAGE_KEY);
+          }
+        } catch {
+          localStorage.removeItem(ADMIN_STORAGE_KEY);
+        }
+      }
+    }
+  }, []);
+
+  const handleAdminLogin = () => {
+    setAdminError('');
+    
+    if (validateAdminPassword(adminPassword)) {
+      const adminSession = {
+        isAdmin: true,
+        timestamp: Date.now(),
+      };
+      
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminSession));
+      }
+      
+      setIsAdmin(true);
+      setShowAdminLogin(false);
+      setAdminPassword('');
+    } else {
+      setAdminError('Invalid admin password');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(ADMIN_STORAGE_KEY);
+    }
+    setIsAdmin(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-100/30 dark:from-gray-900 dark:via-blue-950/20 dark:to-indigo-950/20">
+      {/* Admin Status Bar */}
+      {mounted && isAdmin && (
+        <div className="bg-green-100 dark:bg-green-900 border-b border-green-200 dark:border-green-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <span className="text-green-800 dark:text-green-200 font-medium">
+                  Admin Mode Active - You can manage events
+                </span>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Link href="/organiser">
+                  <Button variant="outline" size="sm" className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-300 dark:border-green-600 dark:hover:bg-green-900">
+                    Create Event
+                  </Button>
+                </Link>
+                <Button onClick={handleAdminLogout} variant="outline" size="sm" className="text-green-700 border-green-300 hover:bg-green-50 dark:text-green-300 dark:border-green-600 dark:hover:bg-green-900">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out Admin
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Login Modal */}
+      {showAdminLogin && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-md w-full">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                      Admin Login
+                    </h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Sign in to manage events
+                    </p>
+                  </div>
+                </div>
+                <Button onClick={() => setShowAdminLogin(false)} variant="ghost" size="sm">
+                  ×
+                </Button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Input
+                    type="password"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    placeholder="Enter admin password"
+                    className={adminError ? 'border-red-500' : ''}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAdminLogin()}
+                  />
+                  {adminError && (
+                    <p className="text-sm text-red-600 mt-1">
+                      {adminError}
+                    </p>
+                  )}
+                </div>
+
+                <Button onClick={handleAdminLogin} disabled={!adminPassword} className="w-full">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign In as Admin
+                </Button>
+              </div>
+
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                <p className="text-xs text-blue-800 dark:text-blue-200">
+                  <strong>Default password:</strong> 1106
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Auth Demo Section - Collapsed by default */}
       <div className="mb-12">
         <details className="group">
@@ -42,13 +187,33 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-            <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl">
-              Start Your Event
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="bg-white dark:bg-gray-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md">
-              Join an Event
-            </button>
+            {mounted && !isAdmin ? (
+              <button
+                onClick={() => setShowAdminLogin(true)}
+                className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl"
+              >
+                <Shield className="h-5 w-5" />
+                Admin Login
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            ) : mounted && isAdmin ? (
+              <Link href="/organiser">
+                <button className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl">
+                  Create Event
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </Link>
+            ) : (
+              <button className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl">
+                Start Your Event
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            )}
+            <Link href="/events">
+              <button className="bg-white dark:bg-gray-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-700 px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 shadow-sm hover:shadow-md">
+                Join an Event
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -180,9 +345,20 @@ export default function Home() {
               <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
                 Join the growing community of organizers who trust Unconf2 for their unconference events.
               </p>
-              <button className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
-                Get Started Today
-              </button>
+              {mounted && isAdmin ? (
+                <Link href="/organiser">
+                  <button className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
+                    Create Your Event
+                  </button>
+                </Link>
+              ) : (
+                <button 
+                  onClick={() => setShowAdminLogin(true)}
+                  className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 text-lg rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Get Started Today
+                </button>
+              )}
             </div>
           </div>
         </div>
