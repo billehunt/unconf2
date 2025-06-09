@@ -6,4 +6,4 @@ export default function ShowcasePage() {
       <ComponentShowcase />
     </div>
   );
-} 
+}

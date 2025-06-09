@@ -102,7 +102,7 @@ export function ComponentShowcase() {
               id="demo-input"
               placeholder="Type something to test..."
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={e => setInputValue(e.target.value)}
             />
             {inputValue && (
               <p className="text-sm text-muted-foreground">
@@ -187,4 +187,4 @@ export function ComponentShowcase() {
       </Card>
     </div>
   );
-} 
+}
