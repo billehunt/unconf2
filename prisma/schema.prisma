@@ -23,6 +23,7 @@ datasource db {
 // Event model - core entity for unconference events
 model Event {
   id String @id @default(uuid())
+  // shortId String @unique // 6-character collision-safe URL slug (TODO: Add via migration)
   title String
   startsAt DateTime
   endsAt DateTime
