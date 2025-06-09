@@ -61,7 +61,7 @@ interface EventEditFormProps {
       sortOrder: number;
     }>;
   };
-  onUpdate: () => void;
+  onUpdate?: () => void;
 }
 
 export function EventEditForm({ event, onUpdate }: EventEditFormProps) {
@@ -116,7 +116,12 @@ export function EventEditForm({ event, onUpdate }: EventEditFormProps) {
       }
 
       logger.info('Event details updated', { eventId: event.id });
-      onUpdate();
+      if (onUpdate) {
+        onUpdate();
+      } else {
+        // Refresh the page to show updated data
+        window.location.reload();
+      }
     } catch (error) {
       logger.error('Failed to update event details', error as Error);
       alert('Failed to update event details. Please try again.');
@@ -139,7 +144,12 @@ export function EventEditForm({ event, onUpdate }: EventEditFormProps) {
       }
 
       logger.info('Rooms updated', { eventId: event.id, roomCount: rooms.length });
-      onUpdate();
+      if (onUpdate) {
+        onUpdate();
+      } else {
+        // Refresh the page to show updated data
+        window.location.reload();
+      }
     } catch (error) {
       logger.error('Failed to update rooms', error as Error);
       alert('Failed to update rooms. Please try again.');
@@ -162,7 +172,12 @@ export function EventEditForm({ event, onUpdate }: EventEditFormProps) {
       }
 
       logger.info('Time blocks updated', { eventId: event.id, blockCount: timeBlocks.length });
-      onUpdate();
+      if (onUpdate) {
+        onUpdate();
+      } else {
+        // Refresh the page to show updated data
+        window.location.reload();
+      }
     } catch (error) {
       logger.error('Failed to update time blocks', error as Error);
       alert('Failed to update time blocks. Please try again.');

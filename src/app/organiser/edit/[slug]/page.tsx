@@ -189,13 +189,7 @@ export default async function EventEditPage({ params }: EventEditPageProps) {
           </Card>
 
           {/* Event Edit Form */}
-          <EventEditForm 
-            event={event} 
-            onUpdate={() => {
-              // Refresh the page to show updated data
-              window.location.reload();
-            }} 
-          />
+          <EventEditForm event={event} />
           
           {/* Danger Zone */}
           <Card className="border-red-200 dark:border-red-800">
