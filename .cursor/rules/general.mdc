@@ -1,0 +1,62 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+### Components & Naming
+
+- Use functional components with `"use client"` if needed.
+- Name in PascalCase under `src/components/`.
+- Keep them small, typed with interfaces.
+- Use Tailwind and ShadCN for common UI components like textarea, button, etc.
+
+### Prisma
+
+- Manage DB logic with Prisma in `prisma/schema.prisma`, `src/lib/db.ts`.
+- snake_case table → camelCase fields.
+- No raw SQL; run `npx prisma migrate dev`, never use `npx prisma db push`.
+
+### Icons
+
+- Prefer `lucide-react`; name icons in PascalCase.
+- Custom icons in `src/components/icons`.
+
+### Next.js Structure
+
+- Use App Router in `app/`. Server components by default, `"use client"` for client logic.
+- NextAuth + Prisma for auth. `.env` for secrets.
+
+### TypeScript & Syntax
+
+- Strict mode. Avoid `any`.
+- Use optional chaining, union types (no enums).
+
+### File & Folder Names
+
+- Next.js routes in kebab-case (e.g. `app/dashboard/page.tsx`).
+- Shared types in `src/lib/types.ts`.
+- Sort imports (external → internal → sibling → styles).
+
+### AI
+
+- Use OpenAI for all AI calls.
+- Use GPT-4.1 model for streaming and o3 model for reasoning.
+
+### Storybook
+
+- Place stories in `src/stories` with `.stories.tsx` extension.
+- One story file per component, matching component name.
+- Use autodocs for automatic documentation.
+- Include multiple variants and sizes in stories.
+- Test interactive features with actions.
+- Use relative imports from component directory.
+
+### Additional
+
+- Keep code short; commits semantic.
+
+### IMPORTANT:
+
+- Always add a one-sentence summary of changes to `.cursor-updates` file in markdown format at the end of every agent interaction.
+- If you forget, the user can type the command "finish" and you will run the build and update `.cursor-updates`.
+- Finally, update git with `git add . && git commit -m "..."`. Don't push.
