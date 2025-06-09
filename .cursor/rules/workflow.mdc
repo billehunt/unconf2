@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Workflow Rules
+
+## High-Level Goal
+Cursor must pull the next **“To Do”** story from the `.tasks.md` file and drive it to **Completed**, log it, mark it completed and commit the work, **and only then** wait for user review.  
+It must **never** pause after individual tasks or subtasks.
+
+---
+
+### Story Completion
+1. When every task is **Completed**, build the project and fix errors:  
+
+        npm run build
+
+2. Append to `.cursor-updates`:  in markdown format:
+   - a H1 one-sentence summary of changes you made
+   - a concise note to yourself of what you would do differently if you performed this task again
+
+3. Update the `.tasks.md` file checking off the task that's been completed.
+
+4. Update git with `git add . && git commit -m "..."`.
+
+### Halting Condition
+
+- Cursor must **never stop or ask for review** after a task or subtask.  
+- It halts **only after** the entire *Story Completion* sequence (steps 1-4 above) is finished, then awaits further user input.
+
+---
+
+### Git
+
+- Follow Conventional Commits (`feat:`, `fix:`, `chore:`, …).
+
+### Important
+
+- A story is not “done” until the build passes. Run `npm run build` and resolve errors **before** completing the story.
