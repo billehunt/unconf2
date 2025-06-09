@@ -44,6 +44,12 @@ export function AppShell({ children, className }: AppShellProps) {
                 Home
               </a>
               <a 
+                href="/organiser" 
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Create Event
+              </a>
+              <a 
                 href="/setup" 
                 className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               >

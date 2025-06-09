@@ -90,3 +90,9 @@ Successfully installed @tanstack/react-query and @tanstack/react-query-devtools,
 
 **Rule for future projects:** Configure React Query defaults thoughtfully from the start - longer stale times reduce unnecessary network requests while shorter cache times prevent memory bloat. When integrating with realtime systems like Supabase, set up automatic query invalidation immediately to ensure UI stays synchronized with database changes. Create query key factories early to maintain consistent caching patterns across the application. Always handle unknown error types properly in retry logic to avoid TypeScript linting issues.
 
+# Implemented Organiser Wizard Step 1 - Event Details Form
+
+Successfully created comprehensive organiser wizard infrastructure with Step 1 Event Details form. Installed react-hook-form, @hookform/resolvers, and zod for robust form handling. Built complete wizard framework with progress indicator, localStorage-based draft persistence, and step navigation. Step 1 features title/date/time validation with Zod schema, optimistic auto-saving (500ms debounce), real-time validation feedback, helpful time format suggestions, and accessibility-compliant form design. Added /organiser route to navigation with proper TypeScript interfaces and error handling. Build passes successfully with 28.8 kB bundle size for organiser route.
+
+**Rule for future projects:** Implement form auto-saving with proper debouncing from the start to prevent data loss during wizard flows. Use Zod schemas for comprehensive validation including cross-field validation (e.g., end time after start time). Create placeholder components for incomplete wizard steps to maintain build compatibility while developing incrementally. Always validate both individual fields and relationships between fields in multi-step forms.
+
