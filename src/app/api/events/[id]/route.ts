@@ -6,6 +6,68 @@ interface RouteContext {
   params: { id: string };
 }
 
+export async function GET(request: NextRequest, { params }: RouteContext) {
+  try {
+    const { id } = params;
+
+    // First try to find by friendly slug in settings
+    const events = await prisma.event.findMany({
+      include: {
+        rooms: {
+          orderBy: { sortOrder: 'asc' },
+        },
+        timeBlocks: {
+          orderBy: { sortOrder: 'asc' },
+        },
+        _count: {
+          select: {
+            topics: true,
+            attendees: true,
+          },
+        },
+      },
+    });
+
+    // Look for event with matching friendly slug in settings
+    let event = events.find(e => {
+      const settings = e.settings as any;
+      return settings?.friendlySlug === id;
+    });
+
+    // Fallback to UUID lookup for backwards compatibility
+    if (!event) {
+      event = events.find(e => e.id === id);
+    }
+
+    if (!event) {
+      return NextResponse.json(
+        { error: 'Event not found' },
+        { status: 404 }
+      );
+    }
+
+    logger.info('Event fetched successfully', {
+      component: 'event-get-api',
+      eventId: event.id,
+    });
+
+    return NextResponse.json({
+      success: true,
+      event,
+    });
+
+  } catch (error) {
+    logger.error('Failed to fetch event', error as Error, {
+      component: 'event-get-api',
+    });
+
+    return NextResponse.json(
+      { error: 'Failed to fetch event' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(request: NextRequest, { params }: RouteContext) {
   try {
     const { id } = params;
@@ -73,4 +135,4 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       { status: 500 }
     );
   }
-} 
+}
